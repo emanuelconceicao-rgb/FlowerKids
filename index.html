@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Kids</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="main-header">
+        <div class="header-top">
+            <div class="social-contact">
+                <span>📞 (11) 99999-9999</span>
+                <span>📸 @flowerkids</span>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="logo-container" id="logo-home">
+                <div class="logo-badge">
+                    <span class="logo-leaf">🌿</span>
+                    <div>
+                        <div class="logo-text">FLOWER KIDS</div>
+                        <div class="logo-sub">FLORICULTURA</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-bar" id="search-container">
+                <input type="text" id="search-input" placeholder="O que você está procurando hoje?">
+                <button class="search-icon" id="search-btn">🔍</button>
+                <div class="search-dropdown" id="search-dropdown"></div>
+            </div>
+
+            <div class="header-actions">
+                <div class="action-item" id="btn-account">
+                    <div class="action-icon">👤</div>
+                    <span id="account-label">CONTA</span>
+                </div>
+                <div class="action-item" id="btn-cart">
+                    <div class="action-icon">
+                        🛒
+                        <span class="cart-badge" id="cart-badge">0</span>
+                    </div>
+                    <span>CARRINHO</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="category-nav">
+        <ul>
+            <li class="nav-item active" data-target="home">HOME</li>
+            <li class="nav-item" data-target="flores-avulsas">FLORES AVULSAS</li>
+            <li class="nav-item" data-target="arranjos">ARRANJOS</li>
+            <li class="nav-item" data-target="buques">BUQUÊS</li>
+            <li class="nav-item" data-target="cestas">CESTAS</li>
+            <li class="nav-item" data-target="kit-presente">KITS PRESENTES</li>
+            <li class="nav-item" data-target="mega-buques">MEGA BUQUÊS</li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+
+        <div id="view-home" class="page-view active">
+            <h3 class="section-title">Mais Vendidos</h3>
+            <div id="grid-mais-vendidos" class="products-grid"></div>
+
+            <h3 class="section-title">Destaques Mega</h3>
+            <div id="grid-home-mega" class="products-grid"></div>
+        </div>
+
+        <div id="view-flores-avulsas" class="page-view">
+            <h3 class="section-title">Flores Avulsas</h3>
+            <div id="grid-flores-avulsas" class="products-grid"></div>
+        </div>
+
+        <div id="view-arranjos" class="page-view">
+            <h3 class="section-title">Arranjos</h3>
+            <div id="grid-arranjos" class="products-grid"></div>
+        </div>
+
+        <div id="view-buques" class="page-view">
+            <h3 class="section-title">Buquês</h3>
+            <div id="grid-buques" class="products-grid"></div>
+        </div>
+
+        <div id="view-cestas" class="page-view">
+            <h3 class="section-title">Cestas</h3>
+            <div id="grid-cestas" class="products-grid"></div>
+        </div>
+
+        <div id="view-kit-presente" class="page-view">
+            <h3 class="section-title">Kits Presentes</h3>
+            <div id="grid-kit-presente" class="products-grid"></div>
+        </div>
+
+        <div id="view-mega-buques" class="page-view">
+            <h3 class="section-title">Mega Buquês</h3>
+            <div id="grid-mega-buques" class="products-grid"></div>
+        </div>
+
+        <div id="view-pesquisa" class="page-view">
+            <h3 class="section-title">Resultados da Busca</h3>
+            <div id="grid-pesquisa" class="products-grid"></div>
+        </div>
+
+        <div id="view-login" class="page-view">
+            <div class="login-container">
+                <div class="login-box-left">
+                    <h3>Já tenho cadastro</h3>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="login-email" placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" id="login-senha" placeholder="Sua senha">
+                    </div>
+                    <a href="#" id="link-esqueci" class="form-link">Esqueci minha senha</a>
+                    <button class="btn-submit" id="btn-entrar">ENTRAR</button>
+                </div>
+                <div class="login-divider"></div>
+                <div class="login-box-right">
+                    <h3>Quero me cadastrar</h3>
+                    <p style="margin-bottom: 20px; color: #4e583d;">Crie sua conta para acompanhar seus pedidos e gerenciar seus endereços de entrega.</p>
+                    <button class="btn-submit" id="btn-ir-cadastro">CRIAR CONTA</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-cadastro" class="page-view">
+            <div class="form-card-centered">
+                <h3>Criar Nova Conta</h3>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Nome Completo</label>
+                    <input type="text" id="cadastro-nome" placeholder="Digite seu nome completo">
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="cadastro-email" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="cadastro-senha" placeholder="Crie uma senha segura">
+                </div>
+                <button class="btn-submit" id="btn-finalizar-cadastro" style="max-width: 100%;">CADASTRAR</button>
+            </div>
+        </div>
+
+        <div id="view-redefinir-senha" class="page-view">
+            <div class="form-card-centered">
+                <h3>Recuperar Senha</h3>
+                <p class="help-text" style="margin: 15px 0; text-align: center;">Informe seu e-mail cadastrado para receber as instruções de redefinição.</p>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" placeholder="seu@email.com">
+                </div>
+                <button class="btn-submit" id="btn-salvar-senha" style="max-width: 100%;">ENVIAR INSTRUÇÕES</button>
+            </div>
+        </div>
+
+        <div id="view-minha-conta" class="page-view account-layout">
+            <aside class="account-sidebar">
+                <h3>Minha Conta</h3>
+                <ul>
+                    <li class="sidebar-item active" data-subtarget="perfil">Meu Perfil</li>
+                    <li class="sidebar-item" data-subtarget="enderecos">Meus Endereços</li>
+                    <li class="sidebar-item" data-subtarget="pedidos">Meus Pedidos</li>
+                    <li class="sidebar-item" data-subtarget="seguranca">Segurança</li>
+                    <li class="sidebar-item" id="btn-sair" style="color: #a83232;">Sair da Conta</li>
+                </ul>
+            </aside>
+
+            <section class="account-subcontent">
+                <div id="subview-perfil" class="sub-view active">
+                    <h3>Dados Pessoais</h3>
+                    <div class="profile-grid">
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="perfil-nome" value="" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            <input type="email" id="perfil-email" value="" disabled>
+                        </div>
+                    </div>
+                    <div class="preferences-box">
+                        <h4>Preferências de Contato</h4>
+                        <label><input type="checkbox" id="pref-email"> Receber novidades por E-mail</label>
+                        <label><input type="checkbox" id="pref-whatsapp"> Receber atualizações por WhatsApp</label>
+                    </div>
+                    <button class="btn-edit">Salvar Alterações</button>
+                </div>
+            </section>
+
+            <div id="subview-enderecos" class="sub-view">
+                <div class="subview-header">
+                    <h3>Endereços Cadastrados</h3>
+                    <button class="btn-action-sm" id="btn-add-endereco-tela">+ Novo Endereço</button>
+                </div>
+
+                <div id="lista-enderecos-container">
+                    <p style="text-align: center; color: #727e5f; padding: 20px;">Nenhum endereço cadastrado. 🏡</p>
+                </div>
+            </div>
+
+            <div id="subview-novo-endereco" class="sub-view">
+                <h3>Adicionar Novo Endereço</h3>
+                <div class="address-form-grid">
+                    <div class="form-group span-2">
+                        <label>Rua/Avenida</label>
+                        <input type="text" id="logradouro" name="logradouro" placeholder="Nome da rua">
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="numero" name="numero" placeholder="123">
+                    </div>
+                    <div class="form-group">
+                        <label>CEP</label>
+                        <input type="text" id="cep" name="cep" placeholder="00000-000">
+                    </div>
+                    <div class="form-group span-2">
+                        <label>Cidade</label>
+                        <input type="text" id="cidade" name="cidade" placeholder="Cidade">
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button class="btn-cancelar" id="btn-cancelar-endereco">Cancelar</button>
+                    <button class="btn-submit-sm" id="btn-salvar-endereco">Salvar Endereço</button>
+                </div>
+            </div>
+
+            <div id="subview-pedidos" class="sub-view">
+                <h3>Meus Pedidos</h3>
+                <div id="lista-pedidos-container">
+                    <p style="text-align: center; color: #727e5f; padding: 20px;">Você ainda não realizou nenhum pedido. 🥀</p>
+                </div>
+            </div>
+
+            <div id="subview-pedidos" class="sub-view">
+                <h3>Meus Pedidos</h3>
+                <div id="lista-pedidos-container">
+                    <p style="text-align: center; color: #727e5f; padding: 20px;">Você ainda não realizou nenhum pedido. 🥀</p>
+                </div>
+            </div>
+
+            <div id="subview-detalhes-pedido" class="sub-view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 id="detalhe-titulo-pedido">Detalhes do Pedido</h3>
+                    <button class="btn-action-sm" id="btn-voltar-pedidos" style="background: #727e5f; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">❮ Voltar</button>
+                </div>
+
+                <div id="corpo-detalhe-pedido">
+                </div>
+            </div>
+
+            <div id="subview-seguranca" class="sub-view">
+                <h3>Segurança da Conta</h3>
+                <div class="security-card">
+                    <div class="security-card-header">Alterar Senha de Acesso</div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Senha Atual</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+                    <button class="btn-submit-sm" id="btn-confirmar-alterar-senha">Atualizar Senha</button>
+                </div>
+            </div>
+            </section>
+        </div>
+
+        <div id="view-checkout" class="page-view">
+            <div class="checkout-layout-container" style="display: flex; gap: 30px; margin-top: 20px;">
+
+                <div class="checkout-steps-main" style="flex: 1;">
+
+                    <div class="checkout-progress-bar" style="display: flex; gap: 10px; margin-bottom: 25px;">
+                        <span class="step" id="step-indicator-1">1. Identificação</span>
+                        <span class="step" id="step-indicator-2">2. Entrega</span>
+                        <span class="step" id="step-indicator-3">3. Pagamento</span>
+                        <span class="step" id="step-indicator-4">4. Confirmação</span>
+                    </div>
+
+                    <div id="checkout-step-1" class="checkout-step-panel active">
+                        <h3>Dados de Identificação</h3>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Nome Completo *</label>
+                            <input type="text" id="chk-nome" placeholder="Seu nome">
+                        </div>
+                        <div class="form-group">
+                            <label>CPF *</label>
+                            <input type="text" id="chk-cpf" placeholder="000.000.000-00">
+                        </div>
+                        <button class="btn-submit" id="btn-ir-entrega">Ir para entrega</button>
+
+                    </div>
+
+                    <div id="checkout-step-2" class="checkout-step-panel">
+                        <h3>Endereço de Entrega</h3>
+                        <div class="address-form-grid" style="margin-top: 15px;">
+                            <div class="form-group span-2">
+                                <label>Rua *</label>
+                                <input type="text" id="chk-rua" placeholder="Av. Paulista">
+                            </div>
+                            <div class="form-group">
+                                <label>Número *</label>
+                                <input type="text" id="chk-num" placeholder="1500">
+                            </div>
+                            <div class="form-group">
+                                <label>CEP *</label>
+                                <input type="text" id="chk-cep" placeholder="00000-000">
+                            </div>
+                            <div class="form-group span-2">
+                                <label>Complemento</label>
+                                <input type="text" id="chk-comp" placeholder="Apto 42">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 15px;">
+                            <button class="btn-cancelar" id="btn-chk-voltar-2">Voltar</button>
+                            <button class="btn-submit" id="btn-ir-pagamento">Ir para pagamento</button>
+
+                        </div>
+                    </div>
+
+                    <div id="checkout-step-3" class="checkout-step-panel">
+                        <h3>Escolha a Forma de Pagamento</h3>
+
+                        <div class="payment-tabs-container">
+                            <button class="pay-tab-btn active" data-method="pix">
+                                <span class="pay-tab-icon">📱</span> Pix (5% de Desconto)
+                            </button>
+                            <button class="pay-tab-btn" data-method="card">
+                                <span class="pay-tab-icon">💳</span> Cartão de Crédito
+                            </button>
+                        </div>
+
+                        <div class="payment-methods-content">
+                            <div id="pay-panel-pix" class="payment-method-panel active">
+                                <p style="color: #4e583d; font-size: 0.95rem; line-height: 1.5;">
+                                    O código QR correspondente ao pagamento Pix será gerado imediatamente após a finalização do seu pedido. O processamento e a aprovação ocorrem em poucos segundos de forma 100% automatizada.
+                                </p>
+                            </div>
+
+                            <div id="pay-panel-card" class="payment-method-panel">
+                                <div class="form-group">
+                                    <label>Número do Cartão</label>
+                                    <input type="text" placeholder="0000 0000 0000 0000">
+                                </div>
+                                <div class="address-form-grid">
+                                    <div class="form-group span-2">
+                                        <label>Nome Impresso</label>
+                                        <input type="text" placeholder="MARIO SILVA">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Validade</label>
+                                        <input type="text" placeholder="MM/AA">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Código de Segurança (CVV)</label>
+                                    <input type="text" placeholder="123" style="max-width: 120px;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Opções de Parcelamento</label>
+                                    <select id="chk-parcelas" style="padding: 12px 16px; border-radius: 14px; border: 1px solid #a3b292; background-color: #e2ebd5; color: #2c351c; font-size: 1rem; outline: none;"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-top: 25px;">
+                            <button class="btn-cancelar" id="btn-chk-voltar-3">Voltar</button>
+                            <button class="btn-submit-sm" id="btn-chk-finalizar">Finalizar Pedido</button>
+                        </div>
+                    </div>
+
+                    <div id="checkout-step-4" class="checkout-step-panel">
+                        <div style="text-align: center; padding: 20px;">
+                            <span style="font-size: 4rem;">🎉</span>
+                            <h3 style="margin-top: 15px;">Pedido Concluído com Sucesso!</h3>
+                            <p id="conf-order-msg" class="help-text" style="font-size: 1.1rem; margin: 15px 0 25px 0; color: #2c351c;"></p>
+
+                            <div id="pix-container-final" style="display:none; background-color: white; padding: 20px; border-radius: 12px; border: 1px dashed #a4b592; max-width: 320px; margin: 0 auto 25px auto;">
+                                <div style="font-size: 5rem; margin-bottom: 10px;">📱</div>
+                                <p style="font-size: 0.85rem; font-weight: bold; color: #4a5d23; margin-bottom: 10px;">CÓDIGO PIX COPIA E COLA</p>
+                                <input type="text" readonly value="00020101021226830014br.gov.bcb.pix2561flowerkidspagamentos" style="width: 100%; padding: 8px; font-size: 0.8rem; text-align: center; border: 1px solid #ccc; border-radius: 6px;">
+                            </div>
+
+                            <button class="btn-submit" id="btn-chk-home" style="margin: 0 auto;">Voltar para Home</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="chk-summary-box" class="checkout-summary-aside" style="width: 350px; background-color: #f6eeee; border: 1px solid #e0d6d6; padding: 20px; border-radius: 12px; height: fit-content;">
+                    <h4 style="color: #4a5d23; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid #d4c5c5; padding-bottom: 8px;">Resumo da Compra</h4>
+                    <div id="checkout-summary-items" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+
+                    <div class="summary-row" style="display: flex; justify-content: space-between; font-size: 0.95rem; color: #4e583d; margin-bottom: 8px;">
+                        <span>Subtotal:</span>
+                        <span id="chk-subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="summary-row" id="chk-row-desconto" style="display: none; justify-content: space-between; font-size: 0.95rem; color: #2e7d32; margin-bottom: 8px; font-weight: 500;">
+                        <span>Desconto Pix (5%):</span>
+                        <span id="chk-desconto">-R$ 0,00</span>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #d4c5c5; margin: 12px 0;">
+                    <div class="summary-row total-row" style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #2c351c;">
+                        <span>Total:</span>
+                        <span id="chk-total">R$ 0,00</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <aside class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Meu Carrinho</h3>
+            <button class="btn-close-cart" id="btn-close-cart">×</button>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-price">R$ 0,00</span>
+            </div>
+            <button class="btn-checkout">FINALIZAR COMPRA</button>
+        </div>
+    </aside>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 Flower Kids Floricultura. Todos os direitos reservados.</p>
+        <div class="footer-dev">Desenvolvido com carinho pela equipe <span class="axe-logo">AXE</span></div>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
