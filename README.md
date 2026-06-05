@@ -1,11 +1,11 @@
-# 🌸 FlowerKids
+# FlowerKids
 
 Aplicação web para loja de flores e presentes, desenvolvida com **JavaScript**, **Firebase** e **Firestore**.  
 O projeto inclui catálogo de produtos, carrinho de compras, checkout com desconto via PIX e gerenciamento de pedidos e endereços de entrega.
 
 ---
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
 - **Catálogo completo** de flores, buquês, cestas e kits presente.
 - **Carrinho de compras** com atualização dinâmica de itens e valores.
@@ -17,7 +17,7 @@ O projeto inclui catálogo de produtos, carrinho de compras, checkout com descon
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - [Firebase](https://firebase.google.com/) (Auth + Firestore)
 - JavaScript (ES6+)
@@ -27,7 +27,7 @@ O projeto inclui catálogo de produtos, carrinho de compras, checkout com descon
 
 ---
 
-## 📦 Instalação e Uso
+## Instalação e Uso
 
 1. Clone o repositório:
    ```bash
