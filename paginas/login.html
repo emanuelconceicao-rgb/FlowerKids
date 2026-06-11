@@ -1,0 +1,56 @@
+<main class="main-content">
+    <div id="view-login" class="page-view active">
+        <div class="login-container">
+            <div class="login-box-left">
+                <h3>Já tenho cadastro</h3>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="login-email" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="login-senha" placeholder="Sua senha">
+                </div>
+                <a href="#" id="link-esqueci" class="form-link">Esqueci minha senha</a>
+                <button class="btn-submit" id="btn-entrar">ENTRAR</button>
+            </div>
+            <div class="login-divider"></div>
+            <div class="login-box-right">
+                <h3>Quero me cadastrar</h3>
+                <p style="margin-bottom: 20px; color: #4e583d;">Crie sua conta para acompanhar seus pedidos e gerenciar seus endereços de entrega.</p>
+                <button class="btn-submit" id="btn-ir-cadastro">CRIAR CONTA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-cadastro" class="page-view" style="display: none;">
+        <div class="form-card-centered">
+            <h3>Criar Nova Conta</h3>
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Nome Completo</label>
+                <input type="text" id="cadastro-nome" placeholder="Digite seu nome completo">
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" id="cadastro-email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="cadastro-senha" placeholder="Crie uma senha segura">
+            </div>
+            <button class="btn-submit" id="btn-finalizar-cadastro" style="max-width: 100%;">CADASTRAR</button>
+        </div>
+    </div>
+
+    <div id="view-redefinir-senha" class="page-view" style="display: none;">
+        <div class="form-card-centered">
+            <h3>Recuperar Senha</h3>
+            <p class="help-text" style="margin: 15px 0; text-align: center;">Informe seu e-mail cadastrado para receber as instruções de redefinição.</p>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" placeholder="seu@email.com">
+            </div>
+            <button class="btn-submit" id="btn-salvar-senha" style="max-width: 100%;">ENVIAR INSTRUÇÕES</button>
+        </div>
+    </div>
+</main>

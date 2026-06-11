@@ -1,0 +1,103 @@
+<main class="main-content">
+    <div id="view-minha-conta" class="page-view account-layout active">
+        <aside class="account-sidebar">
+            <h3>Minha Conta</h3>
+            <ul>
+                <li class="sidebar-item active" data-subtarget="perfil">Meu Perfil</li>
+                <li class="sidebar-item" data-subtarget="enderecos">Meus Endereços</li>
+                <li class="sidebar-item" data-subtarget="pedidos">Meus Pedidos</li>
+                <li class="sidebar-item" data-subtarget="seguranca">Segurança</li>
+                <li class="sidebar-item" id="btn-sair" style="color: #a83232;">Sair da Conta</li>
+            </ul>
+        </aside>
+
+        <section class="account-subcontent">
+            <div id="subview-perfil" class="sub-view active">
+                <h3>Dados Pessoais</h3>
+                <div class="profile-grid">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="perfil-nome" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="perfil-email" value="">
+                    </div>
+                </div>
+                <div class="preferences-box">
+                    <h4>Preferências de Contato</h4>
+                    <label><input type="checkbox" id="pref-email"> Receber novidades por E-mail</label>
+                    <label><input type="checkbox" id="pref-whatsapp"> Receber atualizações por WhatsApp</label>
+                </div>
+                <button class="btn-edit" id="btn-salvar-perfil">Salvar Alterações</button>
+            </div>
+
+            <div id="subview-enderecos" class="sub-view">
+                <div class="subview-header">
+                    <h3>Endereços Cadastrados</h3>
+                    <button class="btn-action-sm" id="btn-add-endereco-tela">+ Novo Endereço</button>
+                </div>
+                <div id="lista-enderecos-container">
+                    <p style="text-align: center; color: #727e5f; padding: 20px;">Nenhum endereço cadastrado. 🏡</p>
+                </div>
+            </div>
+
+            <div id="subview-novo-endereco" class="sub-view">
+                <h3>Adicionar Novo Endereço</h3>
+                <div class="address-form-grid">
+                    <div class="form-group span-2">
+                        <label>Rua/Avenida</label>
+                        <input type="text" id="logradouro" name="logradouro" placeholder="Nome da rua">
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="numero" name="numero" placeholder="123">
+                    </div>
+                    <div class="form-group">
+                        <label>CEP</label>
+                        <input type="text" id="cep" name="cep" placeholder="00000-000">
+                    </div>
+                    <div class="form-group span-2">
+                        <label>Cidade</label>
+                        <input type="text" id="cidade" name="cidade" placeholder="Cidade">
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button class="btn-cancelar" id="btn-cancelar-endereco">Cancelar</button>
+                    <button class="btn-submit-sm" id="btn-salvar-endereco">Salvar Endereço</button>
+                </div>
+            </div>
+
+            <div id="subview-pedidos" class="sub-view">
+                <h3>Meus Pedidos</h3>
+                <div id="lista-pedidos-container">
+                    <p style="text-align: center; color: #727e5f; padding: 20px;">Você ainda não realizou nenhum pedido. 🥀</p>
+                </div>
+            </div>
+
+            <div id="subview-detalhes-pedido" class="sub-view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 id="detalhe-titulo-pedido">Detalhes do Pedido</h3>
+                    <button class="btn-action-sm" id="btn-voltar-pedidos" style="background: #727e5f; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">❮ Voltar</button>
+                </div>
+                <div id="corpo-detalhe-pedido"></div>
+            </div>
+
+            <div id="subview-seguranca" class="sub-view">
+                <h3>Segurança da Conta</h3>
+                <div class="security-card">
+                    <div class="security-card-header">Alterar Senha de Acesso</div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Senha Atual</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+                    <button class="btn-submit-sm" id="btn-confirmar-alterar-senha">Atualizar Senha</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>

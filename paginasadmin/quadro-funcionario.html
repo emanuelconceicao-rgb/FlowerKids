@@ -1,0 +1,197 @@
+<style>
+    /* Oculta o cabeçalho e rodapé do site do cliente */
+    
+    .main-header,
+    .shop-nav,
+    .cart-sidebar,
+    .footer-padrao,
+    nav,
+    .nav-container,
+    .menu-categorias,
+    .nav-items {
+        display: none !important;
+    }
+    /* Reseta o espaçamento */
+    
+    .main-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+    
+     :root {
+        --admin-bg: #e4eed8;
+        --admin-header-bg: #5f7a3f;
+        --admin-text-dark: #333333;
+        --admin-border: #728c52;
+    }
+    
+    .admin-dashboard-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: var(--admin-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--admin-text-dark);
+    }
+    /* HEADER ADMIN */
+    
+    .admin-topbar {
+        background-color: var(--admin-header-bg);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    /* CORPO E SIDEBAR */
+    
+    .admin-body {
+        display: flex;
+        flex: 1;
+    }
+    
+    .admin-sidebar {
+        width: 250px;
+        background-color: #f1f8e9;
+        border-right: 1px solid #cddbc0;
+        padding: 30px 0;
+    }
+    
+    .admin-sidebar h3 {
+        padding: 0 25px;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .admin-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-menu li {
+        margin-bottom: 5px;
+    }
+    
+    .admin-menu a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 25px;
+        text-decoration: none;
+        color: var(--admin-text-dark);
+        font-size: 14px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .admin-menu a:hover {
+        background-color: #e4eed8;
+    }
+    
+    .admin-menu li.active a {
+        background-color: var(--admin-header-bg);
+        color: white;
+        border-radius: 0 20px 20px 0;
+        margin-right: 20px;
+    }
+    /* CONTEÚDO PRINCIPAL (QUADRO DE FUNCIONÁRIOS) */
+    
+    .admin-main-content {
+        flex: 1;
+        padding: 40px;
+        background-color: var(--admin-bg);
+    }
+    
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .header-actions h2 {
+        margin: 0;
+        font-size: 24px;
+        color: #4a5d23;
+    }
+    
+    .btn-novo-func {
+        background: #4a5d23;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        transition: background 0.3s;
+    }
+    
+    .btn-novo-func:hover {
+        background: #3a4a1c;
+    }
+    
+    #container-quadro-funcionarios {
+        background-color: white;
+        border: 1px solid var(--admin-border);
+        border-radius: 12px;
+        padding: 20px;
+        min-height: 400px;
+    }
+    /* O estilo dos cards inseridos pelo JavaScript herda as configurações globais, mas podemos dar um toque extra */
+    
+    .order-item-card {
+        background: #fdfdfd;
+        border: 1px solid #eee !important;
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+    
+    .order-item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+<div class="admin-dashboard-wrapper">
+
+    <header class="admin-topbar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="https://ui-avatars.com/api/?name=FK&background=fff&color=5f7a3f&rounded=true" alt="Logo" style="height: 50px; border-radius: 50%;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 500;">Admin</h1>
+        </div>
+        <div style="font-size: 24px; cursor: pointer; display: flex; gap: 20px;">
+            <span>🔔</span>
+            <span>👤</span>
+        </div>
+    </header>
+
+    <div class="admin-body">
+        <aside class="admin-sidebar">
+            <h3>Minha Conta</h3>
+            <ul class="admin-menu">
+                <li><a onclick="carregarPagina('pedidos-admin')">📦 Dashboard Pedidos</a></li>
+                <li class="active"><a onclick="carregarPagina('quadro-funcionario')">👥 Funcionários</a></li>
+                <li><a onclick="carregarPagina('faturamento-dia')">💰 Faturamento</a></li>
+                <li><a onclick="carregarPagina('perfil-funcionario')">👤 Meu Perfil</a></li>
+                <li><a onclick="carregarPagina('home')">↪ Voltar à Loja</a></li>
+            </ul>
+        </aside>
+
+        <section class="admin-main-content">
+            <div class="header-actions">
+                <h2>Quadro de Funcionários</h2>
+                <button id="nav-ir-novo-func" class="btn-novo-func">+ Novo Funcionário</button>
+            </div>
+
+            <div id="container-quadro-funcionarios">
+                <p style="text-align: center; color: #727e5f; padding: 40px; font-size: 16px;">
+                    Carregando a equipa no banco de dados... ⏳
+                </p>
+            </div>
+        </section>
+    </div>
+</div>

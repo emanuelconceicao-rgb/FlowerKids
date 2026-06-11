@@ -1,0 +1,129 @@
+<main class="main-content">
+    <div id="view-checkout" class="page-view active">
+        <div class="checkout-layout-container" style="display: flex; gap: 30px; margin-top: 20px;">
+
+            <div class="checkout-steps-main" style="flex: 1;">
+                <div class="checkout-progress-bar" style="display: flex; gap: 10px; margin-bottom: 25px;">
+                    <span class="step" id="step-indicator-1">1. Identificação</span>
+                    <span class="step" id="step-indicator-2">2. Entrega</span>
+                    <span class="step" id="step-indicator-3">3. Pagamento</span>
+                    <span class="step" id="step-indicator-4">4. Confirmação</span>
+                </div>
+
+                <div id="checkout-step-1" class="checkout-step-panel active">
+                    <h3>Dados de Identificação</h3>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Nome Completo *</label>
+                        <input type="text" id="chk-nome" placeholder="Seu nome">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF *</label>
+                        <input type="text" id="chk-cpf" placeholder="000.000.000-00">
+                    </div>
+                    <button class="btn-submit" id="btn-ir-entrega">Ir para entrega</button>
+                </div>
+
+                <div id="checkout-step-2" class="checkout-step-panel">
+                    <h3>Dados de Entrega</h3>
+                    <div style="display: flex; gap: 15px; margin-top: 15px;">
+                        <div class="form-group" style="flex: 2;">
+                            <label>Rua *</label>
+                            <input type="text" id="chk-rua" placeholder="Av. Paulista">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Número *</label>
+                            <input type="text" id="chk-num" placeholder="1500">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>CEP *</label>
+                            <input type="text" id="chk-cep" placeholder="00000-000">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Complemento</label>
+                            <input type="text" id="chk-complemento" placeholder="Apt 42">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 25px;">
+                        <button class="btn-submit" id="btn-chk-voltar-2" style="background-color: #f6eeee; color: #4a5d23; border: 1px solid #4a5d23;">Voltar</button>
+                        <button class="btn-submit" id="btn-ir-pagamento">Ir para pagamento</button>
+                    </div>
+                </div>
+
+                <div id="checkout-step-3" class="checkout-step-panel">
+                    <h3>Forma de Pagamento</h3>
+                    <div class="payment-tabs-container" style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 20px;">
+                        <button class="pay-tab-btn active" data-method="pix">Pix (5% OFF)</button>
+                        <button class="pay-tab-btn" data-method="cartao">Cartão de Crédito</button>
+                    </div>
+
+                    <div id="pay-panel-pix" class="payment-method-panel active">
+                        <p style="font-size: 0.95rem; color: #666;">O código Pix Copia e Cola será gerado na próxima tela.</p>
+                    </div>
+
+                    <div id="pay-panel-cartao" class="payment-method-panel">
+                        <div class="form-group">
+                            <label>Número do Cartão</label>
+                            <input type="text" placeholder="0000 0000 0000 0000">
+                        </div>
+                        <div style="display: flex; gap: 15px;">
+                            <div class="form-group" style="flex: 2;">
+                                <label>Validade</label>
+                                <input type="text" placeholder="MM/AA">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>CVV</label>
+                                <input type="text" placeholder="123">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Parcelas</label>
+                            <select id="chk-parcelas" class="form-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;"></select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 25px;">
+                        <button class="btn-submit" id="btn-chk-voltar-3" style="background-color: #f6eeee; color: #4a5d23; border: 1px solid #4a5d23;">Voltar</button>
+                        <button class="btn-submit" id="btn-chk-finalizar">Finalizar Compra</button>
+                    </div>
+                </div>
+
+                <div id="checkout-step-4" class="checkout-step-panel" style="text-align: center; padding: 30px 10px;">
+                    <div style="font-size: 4rem; color: #727e5f; margin-bottom: 15px;">🌸</div>
+                    <h3 style="color: #4a5d23; margin-bottom: 10px;">Pedido Recebido!</h3>
+                    <p id="conf-order-msg" style="color: #555; line-height: 1.5; margin-bottom: 25px; max-width: 400px; margin-left: auto; margin-right: auto;"></p>
+
+                    <div id="pix-container-final" style="display: none; background-color: #fff; border: 1px solid #e2d6d6; padding: 20px; border-radius: 8px; margin-bottom: 25px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                        <div style="width: 150px; height: 150px; background-color: #eee; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #666; border: 1px dashed #bbb;">[ QR CODE PIX ]</div>
+                        <input type="text" value="00020126360014BR.GOV.BCB.PIX0114flowerkidspix25" readonly style="width: 100%; padding: 10px; text-align: center; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 4px; background-color: #fafafa; margin-bottom: 10px;">
+                        <button class="btn-submit" style="padding: 8px 15px; font-size: 0.9rem;" onclick="alert('Código copiado!')">Copiar Código Pix</button>
+                    </div>
+
+                    <button class="btn-submit" id="btn-chk-home" style="max-width: 250px; margin: 0 auto;">Voltar para o Início</button>
+                </div>
+
+            </div>
+
+            <div class="checkout-summary-sidebar" style="width: 350px; background-color: #f6eeee; border: 1px solid #e0d6d6; padding: 20px; border-radius: 12px; height: fit-content;">
+                <h4 style="color: #4a5d23; font-size: 1.2rem; margin-bottom: 15px; border-bottom: 1px solid #d4c5c5; padding-bottom: 8px;">Resumo da Compra</h4>
+                <div id="checkout-summary-items" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+                <div class="summary-row" style="display: flex; justify-content: space-between; font-size: 0.95rem; color: #4e583d; margin-bottom: 8px;">
+                    <span>Subtotal:</span>
+                    <span id="chk-subtotal">R$ 0,00</span>
+                </div>
+                <div class="summary-row" id="chk-row-desconto" style="display: none; justify-content: space-between; font-size: 0.95rem; color: #2e7d32; margin-bottom: 8px; font-weight: 500;">
+                    <span>Desconto Pix (5%):</span>
+                    <span id="chk-desconto">-R$ 0,00</span>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #d4c5c5; margin: 12px 0;">
+                <div class="summary-row" style="display: flex; justify-content: space-between; font-size: 1.1rem; color: #4a5d23; font-weight: bold;">
+                    <span>Total:</span>
+                    <span id="chk-total">R$ 0,00</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
