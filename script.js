@@ -231,11 +231,6 @@ onAuthStateChanged(auth, async(user) => {
 // ==========================================
 // NAVEGAÇÃO DINÂMICA SPA (ROTEAMENTO INTELIGENTE)
 // ==========================================
-
-
-
-window.carregarPagina = carregarPagina; // 👉 ADICIONE ESTA LINHA AQUI!
-
 async function carregarPagina(nomePagina, subviewOpcional = null, contextData = null) {
     const mainContent = document.querySelector('.main-content');
     if (!mainContent) return;
@@ -243,15 +238,11 @@ async function carregarPagina(nomePagina, subviewOpcional = null, contextData = 
 
     let pastaDestino = "paginas";
 
-
     // Configuração para aceitar as páginas da pasta paginasadmin
     const paginasAdmin = [
-        'login-admin',
+        'home-admin',
         'pedidos-admin',
-        'reset-senha-admin',
-        'cadastro-funcionario',
         'quadro-funcionario',
-        'perfil-funcionario',
         'pedidos-entregues',
         'cancelar-pedido',
         'faturamento-dia'
@@ -412,58 +403,15 @@ function initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData) 
     }
 
     // ---- TELAS ADMINISTRATIVAS ----
-    if (nomePagina === 'login-admin') {
-        const btnEntrarAdmin = document.getElementById("btn-entrar-admin");
-        if (btnEntrarAdmin) btnEntrarAdmin.addEventListener("click", executarLoginInteligente);
-
-        const linkEsqueciAdmin = document.getElementById("link-esqueci-admin");
-        if (linkEsqueciAdmin) linkEsqueciAdmin.addEventListener("click", () => carregarPagina('reset-senha-admin'));
-    }
-
-    if (nomePagina === 'reset-senha-admin') {
-        const btnEnviarResetAdmin = document.getElementById("btn-enviar-reset-admin");
-        if (btnEnviarResetAdmin) {
-            btnEnviarResetAdmin.addEventListener("click", () => {
-                const email = document.getElementById("admin-reset-email") ? document.getElementById("admin-reset-email").value.trim() : "";
-                if (!email) return alert("Insira seu e-mail corporativo.");
-                sendPasswordResetEmail(auth, email)
-                    .then(() => {
-                        alert("Instruções de redefinição enviadas!");
-                        carregarPagina('login-admin');
-                    })
-                    .catch(err => alert("Erro: " + err.message));
-            });
-        }
-        const btnVoltarLoginAdmin = document.getElementById("btn-voltar-login-admin");
-        if (btnVoltarLoginAdmin) btnVoltarLoginAdmin.addEventListener("click", () => carregarPagina('login-admin'));
-    }
-
-    if (nomePagina === 'perfil-funcionario') {
-        if (typeof carregarDadosFichaFuncionario === "function") carregarDadosFichaFuncionario();
-        const btnSalvarSoloFunc = document.getElementById("btn-salvar-solo-func");
-        if (btnSalvarSoloFunc) btnSalvarSoloFunc.addEventListener("click", salvarDadosFichaFuncionario);
-
-        const btnSairFunc = document.getElementById("btn-sair-func");
-        if (btnSairFunc) btnSairFunc.addEventListener("click", () => { signOut(auth).then(() => carregarPagina('home')); });
-    }
-
     if (nomePagina === 'quadro-funcionario') {
         if (typeof carregarQuadroDeFuncionarios === "function") carregarQuadroDeFuncionarios();
         const navIrNovoFunc = document.getElementById("nav-ir-novo-func");
         if (navIrNovoFunc) navIrNovoFunc.addEventListener("click", () => carregarPagina('cadastro-funcionario'));
     }
 
-    if (nomePagina === 'cadastro-funcionario') {
-        const btnSalvarCadFunc = document.getElementById("btn-salvar-cadastro-func");
-        if (btnSalvarCadFunc && typeof executarCriarNovoFuncionario === "function") btnSalvarCadFunc.addEventListener("click", executarCriarNovoFuncionario);
-    }
-
     if (nomePagina === 'pedidos-admin') {
-        // ATUALIZAÇÃO: AGORA CHAMA O NOVO MOTOR DE DASHBOARD
-        if (typeof carregarDashboardPedidosAdmin === "function") carregarDashboardPedidosAdmin();
-
-        const navPedidosEntregues = document.getElementById("nav-pedidos-entregues");
-        if (navPedidosEntregues) navPedidosEntregues.addEventListener("click", () => carregarPagina('pedidos-entregues'));
+        // Carrega os dados do Firebase direto para os novos cards do Dashboard
+        carregarDashboardPedidosAdmin();
     }
 
     if (nomePagina === 'pedidos-entregues') {
@@ -508,11 +456,13 @@ function renderGrid(containerId, productList) {
             <p class="product-price">${prod.preco}</p>
             <button class="btn-buy">Comprar</button>
         `;
+        // Lógica FALTANTE que foi adicionada para o botão Comprar
         card.querySelector(".btn-buy").addEventListener("click", () => {
             alert(prod.nome + " adicionado ao carrinho!");
 
             const precoFormatado = parseFloat(prod.preco.replace("R$", "").replace(".", "").replace(",", "."));
 
+            // Verifica se o item já está no carrinho
             const itemExistente = carrinho.find(item => item.nome === prod.nome);
             if (itemExistente) {
                 itemExistente.quantidade++;
@@ -554,6 +504,7 @@ function atualizarInterfaceCarrinho() {
                 </div>
             `;
 
+            // Lógica para remover item do carrinho
             div.querySelector(".remove-btn").addEventListener("click", (e) => {
                 const i = e.currentTarget.getAttribute("data-index");
                 carrinho.splice(i, 1);
@@ -654,6 +605,7 @@ async function executarLoginInteligente() {
         const cred = await signInWithEmailAndPassword(auth, email, senha);
         const uid = cred.user.uid;
 
+        // Verifica se é administrador
         const funcSnap = await getDoc(doc(db, "funcionarios", uid));
         let isFunc = false;
 
@@ -668,7 +620,7 @@ async function executarLoginInteligente() {
 
         if (isFunc) {
             alert("Acesso Administrativo Confirmado!");
-            carregarPagina('pedidos-admin');
+            carregarPagina('home-admin'); // <--- ALTERADO AQUI
         } else {
             carregarPagina('minha-conta', 'subview-perfil');
         }
@@ -853,52 +805,96 @@ async function carregarPedidosUsuario() {
 }
 
 // ==========================================
-// FUNÇÕES ADMINISTRATIVAS (FUNCIONÁRIOS)
+// FUNÇÕES DO PAINEL DE ADMINISTRAÇÃO
 // ==========================================
-async function carregarDadosFichaFuncionario() {
-    const u = auth.currentUser;
-    if (!u) return;
-    const s = await getDoc(doc(db, "funcionarios", u.uid));
-    if (s.exists()) {
-        const d = s.data();
-        const fNome = document.getElementById("solo-func-nome");
-        if (fNome) fNome.value = d.nome || "";
-        const fCargo = document.getElementById("solo-func-cargo");
-        if (fCargo) fCargo.value = d.cargo || "";
-        const fTelefone = document.getElementById("solo-func-telefone");
-        if (fTelefone) fTelefone.value = d.telefone || "";
-        const fMatricula = document.getElementById("solo-func-matricula");
-        if (fMatricula) fMatricula.value = d.matricula || "";
-        const fAdmissao = document.getElementById("solo-func-admissao");
-        if (fAdmissao) fAdmissao.value = d.admissao || "";
-    }
-    const fEmail = document.getElementById("solo-func-email");
-    if (fEmail) fEmail.value = u.email;
-}
 
-async function salvarDadosFichaFuncionario() {
-    const u = auth.currentUser;
-    if (!u) return alert("Sessão corporativa encerrada!");
-    await setDoc(doc(db, "funcionarios", u.uid), {
-        nome: document.getElementById("solo-func-nome") ? document.getElementById("solo-func-nome").value.trim() : "",
-        cargo: document.getElementById("solo-func-cargo") ? document.getElementById("solo-func-cargo").value.trim() : "",
-        telefone: document.getElementById("solo-func-telefone") ? document.getElementById("solo-func-telefone").value.trim() : "",
-        matricula: document.getElementById("solo-func-matricula") ? document.getElementById("solo-func-matricula").value.trim() : "",
-        admissao: document.getElementById("solo-func-admissao") ? document.getElementById("solo-func-admissao").value : ""
-    }, { merge: true });
-    alert("Alterações gravadas com sucesso na sua ficha de funcionário!");
-}
+// ==========================================================
+// FUNÇÃO DO PAINEL DE ADMINISTRAÇÃO (ESCOPO GLOBAL DO MODULE)
+// ==========================================================
+export async function carregarDashboardPedidosAdmin() {
+    const containerPedidos = document.getElementById('container-pedidos-admin');
+    const countPendentesEl = document.getElementById('admin-count-pendentes');
+    const countEntreguesEl = document.getElementById('admin-count-entregues');
 
-async function executarCriarNovoFuncionario() {
-    const email = document.getElementById("cad-func-email") ? document.getElementById("cad-func-email").value.trim() : "";
-    const senha = document.getElementById("cad-func-senha") ? document.getElementById("cad-func-senha").value.trim() : "";
+    // Se não estivermos na página certa, interrompe para não dar erro
+    if (!containerPedidos) return;
 
-    if (!email || senha.length < 6) return alert("Forneça um e-mail válido e uma senha com no mínimo 6 dígitos.");
     try {
-        alert("Novo funcionário registrado com sucesso na base de talentos!");
-        carregarPagina('quadro-funcionario');
-    } catch (e) { alert(e.message); }
+        // Busca os dados na coleção "pedidos" do Firestore
+        // ATENÇÃO: Se no topo do seu script sua variável for "firestore" em vez de "db", mude aqui!
+        const querySnapshot = await getDocs(collection(db, "pedidos"));
+
+        let htmlPedidos = '';
+        let countPendentes = 0;
+        let countEntregues = 0;
+
+        querySnapshot.forEach((docSnap) => {
+            const pedido = docSnap.data();
+            const pedidoId = docSnap.id;
+
+            // Verifica o status (adapte se no seu banco usar outro nome de campo)
+            const status = pedido.status || 'pendente';
+
+            if (status === 'pendente' || status === 'processando' || status === 'Em preparação') {
+                countPendentes++;
+
+                const nomeCliente = pedido.clienteNome || pedido.nome || 'Cliente';
+                const valorTotal = pedido.total ? parseFloat(pedido.total).toFixed(2).replace('.', ',') : '0,00';
+
+                htmlPedidos += `
+                    <div style="border: 1px solid #e0d6d6; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px;">
+                        <div>
+                            <strong style="color: #4a5d23; font-size: 16px;">Pedido #${pedidoId.substring(0,8).toUpperCase()}</strong>
+                            <div style="color: #6b6b6b; font-size: 13px; margin-top: 5px;">
+                                👤 ${nomeCliente} <br>
+                                💰 Valor: R$ ${valorTotal}
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+                            <span style="background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Aguardando Envio</span>
+                            <button onclick="atualizarStatusPedido('${pedidoId}', 'entregue')" style="padding: 6px 12px; background: #5f7a3f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                Marcar como Entregue
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (status === 'entregue') {
+                countEntregues++;
+            }
+        });
+
+        // Atualiza as contagens nos cards superiores
+        if (countPendentesEl) countPendentesEl.textContent = countPendentes;
+        if (countEntreguesEl) countEntreguesEl.textContent = countEntregues;
+
+        // Injeta a lista gerada ou a mensagem de vazio
+        if (countPendentes === 0) {
+            containerPedidos.innerHTML = `
+                <div style="text-align: center; color: var(--admin-text-muted); padding: 40px;">
+                    <span style="font-size: 24px; display: block; margin-bottom: 10px;">🎉</span> Nenhum pedido pendente no momento!
+                </div>`;
+        } else {
+            containerPedidos.innerHTML = htmlPedidos;
+        }
+
+    } catch (error) {
+        console.error("Erro ao buscar dados no Firebase:", error);
+        containerPedidos.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Erro ao carregar os pedidos do banco de dados.</p>';
+    }
 }
+
+// Garante que a função de atualizar status fique disponível para o clique do botão
+window.atualizarStatusPedido = async function(pedidoId, novoStatus) {
+    try {
+        if (!confirm("Deseja alterar o status do pedido para entregue?")) return;
+        const pedidoRef = doc(db, "pedidos", pedidoId);
+        await setDoc(pedidoRef, { status: novoStatus }, { merge: true });
+        alert("Pedido atualizado!");
+        carregarDashboardPedidosAdmin(); // Recarrega a lista
+    } catch (e) {
+        console.error(e);
+    }
+};
 
 async function carregarQuadroDeFuncionarios() {
     const c = document.getElementById("container-quadro-funcionarios");
@@ -1000,110 +996,12 @@ async function calcularEExibirFaturamentoDoDia() {
 }
 
 // ==========================================
-// NOVO MOTOR DA TABELA DE DASHBOARD ADMIN
-// ==========================================
-async function carregarDashboardPedidosAdmin() {
-    const tbody = document.getElementById("tbody-pedidos-tabela");
-    if (!tbody) return;
-
-    let qtdPendentes = 0,
-        qtdEntregues = 0,
-        qtdCancelados = 0,
-        faturamento = 0;
-    const hojeStr = new Date().toLocaleDateString('pt-BR');
-    let todosPedidos = [];
-
-    try {
-        const usuarios = await getDocs(collection(db, "usuarios"));
-
-        for (const uDoc of usuarios.docs) {
-            const dadosCliente = uDoc.data();
-            const nomeCliente = dadosCliente.nome || "Cliente sem nome";
-
-            const pedidosSnap = await getDocs(collection(db, "usuarios", uDoc.id, "pedidos"));
-            pedidosSnap.forEach(pDoc => {
-                const p = pDoc.data();
-                todosPedidos.push({
-                    id: pDoc.id,
-                    cliente: nomeCliente,
-                    total: p.total || 0,
-                    status: p.status || "Em preparação",
-                    dataPedido: p.dataPedido ? p.dataPedido.toDate() : new Date()
-                });
-            });
-        }
-
-        todosPedidos.sort((a, b) => b.dataPedido - a.dataPedido);
-        tbody.innerHTML = "";
-
-        todosPedidos.forEach(p => {
-            if (p.status === "Em preparação" || p.status === "Pendente") qtdPendentes++;
-            else if (p.status === "Entregue") qtdEntregues++;
-            else if (p.status === "Cancelado") qtdCancelados++;
-
-            if (p.dataPedido.toLocaleDateString('pt-BR') === hojeStr && p.status !== "Cancelado") {
-                faturamento += p.total;
-            }
-
-            let bgStatus = "#dcedc8";
-            let corStatus = "#558b2f";
-            if (p.status === "Em preparação") {
-                bgStatus = "#eef5e5";
-                corStatus = "#727e5f";
-            }
-            if (p.status === "Entregue") {
-                bgStatus = "#c8e6c9";
-                corStatus = "#2e7d32";
-            }
-            if (p.status === "Cancelado") {
-                bgStatus = "#ffcdd2";
-                corStatus = "#c62828";
-            }
-
-            tbody.innerHTML += `
-                <tr style="border-bottom: 1px solid #d8dec3;">
-                    <td style="padding: 15px 10px; text-align: left;">#${p.id.substring(0,6).toUpperCase()}</td>
-                    <td style="padding: 15px 10px; text-align: left;">${p.cliente}</td>
-                    <td style="padding: 15px 10px;">${p.dataPedido.toLocaleDateString('pt-BR')}</td>
-                    <td style="padding: 15px 10px;">-</td>
-                    <td style="padding: 15px 10px;">
-                        <span style="background: ${bgStatus}; color: ${corStatus}; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block;">
-                            ${p.status}
-                        </span>
-                    </td>
-                    <td style="padding: 15px 10px;">
-                        <button style="background: #4a5d23; color: white; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: bold;">Ver detalhes</button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        const cardPendente = document.getElementById("dash-pendentes");
-        const cardEntregue = document.getElementById("dash-entregues");
-        const cardCancelado = document.getElementById("dash-cancelados");
-        const cardFaturamento = document.getElementById("dash-faturamento");
-
-        if (cardPendente) cardPendente.innerText = qtdPendentes;
-        if (cardEntregue) cardEntregue.innerText = qtdEntregues;
-        if (cardCancelado) cardCancelado.innerText = qtdCancelados;
-        if (cardFaturamento) cardFaturamento.innerText = "R$ " + faturamento.toFixed(2).replace(".", ",");
-
-        if (todosPedidos.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='6' style='text-align: center; padding: 30px; color: #727e5f;'>Ainda não há nenhuma venda registrada no sistema.</td></tr>";
-        }
-
-    } catch (erro) {
-        console.error("Falha ao montar dashboard:", erro);
-        tbody.innerHTML = "<tr><td colspan='6' style='text-align: center; padding: 30px; color: red;'>Falha ao conectar com o banco de dados.</td></tr>";
-    }
-}
-
-// ==========================================
 // INICIALIZAÇÃO GERAL DA PÁGINA FIXA E CARRINHO (DOM)
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     carregarPagina('home');
 
+    // BOTÕES DE ABRIR E FECHAR CARRINHO
     const btnCart = document.getElementById("btn-cart");
     if (btnCart) btnCart.addEventListener("click", abrirCarrinho);
 
@@ -1113,6 +1011,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartOverlay = document.getElementById("cart-overlay");
     if (cartOverlay) cartOverlay.addEventListener("click", fecharCarrinho);
 
+    // BOTÃO DE FINALIZAR COMPRA DENTRO DO CARRINHO
     const btnCheckout = document.querySelector(".btn-checkout");
     if (btnCheckout) {
         btnCheckout.addEventListener("click", () => {
@@ -1151,7 +1050,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnAccount.addEventListener("click", () => {
             if (usuarioEstaLogado) {
                 if (usuarioEFuncionario) {
-                    carregarPagina('pedidos-admin');
+                    carregarPagina('home-admin'); // <--- ALTERADO AQUI
                 } else {
                     carregarPagina('minha-conta', 'subview-perfil');
                 }
@@ -1160,4 +1059,30 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    // === SISTEMA DE LOGOUT DO ADMIN ===
+    document.addEventListener("click", (e) => {
+        // Verifica se o elemento clicado foi o botão de sair do admin
+        if (e.target && e.target.id === "btn-sair-admin") {
+            e.preventDefault();
+
+            // 1. Chama o Firebase para deslogar a sessão no servidor
+            const auth = getAuth(); // Puxa a autenticação do Firebase
+            signOut(auth).then(() => {
+
+                // 2. Limpa o navegador
+                localStorage.removeItem("usuarioLogado");
+                localStorage.removeItem("isFunc");
+
+                // 3. Recarrega a página (agora sim, 100% deslogado)
+                window.location.reload();
+
+            }).catch((error) => {
+                console.error("Erro ao fazer logout no Firebase:", error);
+                // Por segurança, se der erro, força a limpeza local
+                localStorage.removeItem("usuarioLogado");
+                localStorage.removeItem("isFunc");
+                window.location.reload();
+            });
+        }
+    });
 });

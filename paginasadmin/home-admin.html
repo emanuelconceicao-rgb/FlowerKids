@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Flower Kids</title>
+    <style>
+        /* Oculta elementos da loja padrão (ajuste as classes se necessário) */
+        
+        .main-header,
+        .shop-nav,
+        .cart-sidebar,
+        .footer-padrao,
+        nav,
+        .nav-container,
+        .menu-categorias,
+        .nav-items {
+            display: none !important;
+        }
+        /* Reseta o padding do main-content caso haja algum da loja */
+        
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--admin-bg);
+            height: 100vh;
+            overflow: hidden;
+            /* Evita rolagem dupla */
+        }
+        /* Estrutura Principal */
+        
+         :root {
+            /* FUNDO ATUALIZADO: Tom gelo/cinza claro mais clean e moderno */
+            --admin-bg: #f4f7f6;
+            --admin-header-bg: #5f7a3f;
+            --admin-sidebar-bg: #4a5d23;
+            --admin-text-dark: #333333;
+            --admin-text-light: #ffffff;
+            --admin-hover: #728c52;
+            --admin-border: #e0d6d6;
+        }
+        
+        .admin-dashboard-wrapper {
+            display: flex;
+            height: 100vh;
+        }
+        /* Menu Lateral (Sidebar) */
+        
+        .admin-sidebar {
+            width: 260px;
+            background-color: var(--admin-sidebar-bg);
+            color: var(--admin-text-light);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            /* Garante que a sombra fique sobre o fundo */
+        }
+        
+        .admin-sidebar-header {
+            padding: 20px;
+            background-color: var(--admin-header-bg);
+            text-align: center;
+            border-bottom: 1px solid var(--admin-hover);
+        }
+        
+        .admin-sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--admin-text-light);
+        }
+        
+        .admin-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .admin-menu-group {
+            padding: 15px 20px 5px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #b5c79a;
+            letter-spacing: 1px;
+        }
+        
+        .admin-menu li a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--admin-text-light);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        
+        .admin-menu li a:hover,
+        .admin-menu li a.active {
+            background-color: var(--admin-hover);
+            border-left: 4px solid #b5c79a;
+        }
+        /* Área de Conteúdo Principal */
+        
+        .admin-main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--admin-bg);
+            /* Usa a cor de fundo atualizada */
+        }
+        /* Cabeçalho Superior do Painel */
+        
+        .admin-topbar {
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            z-index: 5;
+        }
+        
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--admin-text-dark);
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            color: #a83232;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #ffe6e6;
+        }
+        /* Iframe que carrega as páginas */
+        
+        #conteudo-frame {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+            /* Deixa transparente para mesclar com o fundo clean */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="admin-dashboard-wrapper">
+
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <h2>Flower Kids</h2>
+                <small>Admin Panel</small>
+            </div>
+
+            <ul class="admin-menu">
+                <div class="admin-menu-group">Gestão de Pedidos</div>
+                <li><a href="pedidos-admin.html" target="conteudo-frame" class="active">📦 Dashboard Pedidos</a></li>
+                <li><a href="pedidos-entregues.html" target="conteudo-frame">✅ Pedidos Entregues</a></li>
+                <li><a href="cancelar-pedido.html" target="conteudo-frame">❌ Cancelar Pedido</a></li>
+
+                <div class="admin-menu-group">Finanças</div>
+                <li><a href="faturamento-dia.html" target="conteudo-frame">💰 Faturamento Diário</a></li>
+
+                <div class="admin-menu-group">Equipe (RH)</div>
+                <li><a href="quadro-funcionario.html" target="conteudo-frame">👥 Quadro de Funcionários</a></li>
+            </ul>
+        </aside>
+
+        <section class="admin-main-content">
+            <header class="admin-topbar">
+                <div style="font-weight: bold; color: var(--admin-sidebar-bg);">
+                    Bem-vindo ao Painel Administrativo
+                </div>
+                <div class="topbar-user">
+                    <span style="cursor: pointer;">🔔 Notificações</span>
+                    <span>👤 Admin</span>
+                    <a id="btn-sair-admin" class="logout-btn">Sair</a>
+                </div>
+            </header>
+
+            <iframe name="conteudo-frame" id="conteudo-frame" src="pedidos-admin.html"></iframe>
+        </section>
+
+    </div>
+
+    <script>
+        // Script simples para marcar o link ativo no menu lateral
+        const menuLinks = document.querySelectorAll('.admin-menu a');
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                // Remove a classe active de todos
+                menuLinks.forEach(l => l.classList.remove('active'));
+                // Adiciona a classe active no clicado
+                this.classList.add('active');
+            });
+        });
+
+        // Script de Sair
+        document.getElementById('btn-sair-admin').addEventListener('click', () => {
+            // 1. Limpa as variáveis de sessão do administrador
+            localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('isFunc');
+
+            // 2. Recarrega a página inteira para voltar à loja e bloquear o painel
+            window.location.reload();
+        });
+    </script>
+
+</body>
+
+</html>
