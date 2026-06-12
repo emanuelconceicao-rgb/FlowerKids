@@ -1,24 +1,162 @@
+<!-- ESTILOS EXCLUSIVOS DO ADMIN (Isolamento de Layout) -->
 <style>
+    /* Oculta elementos da loja padrão (ajuste as classes se necessário) */
+    
+    .main-header,
+    .shop-nav,
+    .cart-sidebar,
+    .footer-padrao,
+    nav,
+    .nav-container,
+    .menu-categorias,
+    .nav-items {
+        display: none !important;
+    }
+    /* Reseta o padding do main-content caso haja algum da loja */
+    
+    .main-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+    /* Variáveis de Cor do Tema Admin */
+    
      :root {
-        --admin-card-bg: #ffffff;
+        --admin-bg: #e4eed8;
+        --admin-header-bg: #5f7a3f;
         --admin-text-dark: #333333;
         --admin-text-muted: #6b6b6b;
-        --admin-border: #e0d6d6;
+        --admin-border: #728c52;
+    }
+    /* Container Principal da Tela Admin */
+    
+    .admin-dashboard-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: var(--admin-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--admin-text-dark);
+    }
+    /* ---------------- HEADER ADMIN ---------------- */
+    
+    .admin-topbar {
+        background-color: var(--admin-header-bg);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     
-    .admin-cards-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
+    .admin-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
+    
+    .admin-topbar-left img {
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        padding: 5px;
+    }
+    
+    .admin-topbar-left h1 {
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0;
+        letter-spacing: 1px;
+    }
+    
+    .admin-topbar-right {
+        display: flex;
+        gap: 20px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    /* ---------------- CORPO ADMIN (Sidebar + Conteúdo) ---------------- */
+    
+    .admin-body {
+        display: flex;
+        flex: 1;
+        padding: 0;
+    }
+    /* ---------------- MENU LATERAL (Sidebar) ---------------- */
+    
+    .admin-sidebar {
+        width: 250px;
+        background-color: #f1f8e9;
+        border-right: 1px solid #cddbc0;
+        padding: 30px 0;
+    }
+    
+    .admin-sidebar h3 {
+        padding: 0 25px;
+        font-size: 16px;
+        color: var(--admin-text-dark);
+        margin-bottom: 20px;
+    }
+    
+    .admin-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-menu li {
+        margin-bottom: 5px;
+    }
+    
+    .admin-menu a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 25px;
+        text-decoration: none;
+        color: var(--admin-text-dark);
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .admin-menu a:hover {
+        background-color: #e4eed8;
+    }
+    
+    .admin-menu li.active a {
+        background-color: var(--admin-header-bg);
+        color: white;
+        border-radius: 0 20px 20px 0;
+        margin-right: 20px;
+    }
+    /* ---------------- CONTEÚDO PRINCIPAL ---------------- */
+    
+    .admin-main-content {
+        flex: 1;
+        padding: 40px;
+        background-color: var(--admin-bg);
+    }
+    
+    .admin-main-content h2 {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: var(--admin-text-dark);
+    }
+    /* Grid de Cards */
+    
+    .admin-cards-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    /* Cards Estilo Retângulo Arredondado (Imagem) */
     
     .admin-card {
-        background-color: var(--admin-card-bg);
         border: 1px solid var(--admin-border);
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        border-radius: 12px;
+        padding: 25px;
+        background-color: transparent;
     }
     
     .admin-card.full-width {
@@ -131,12 +269,12 @@
         <aside class="admin-sidebar">
             <h3>Minha Conta</h3>
             <ul class="admin-menu">
-                <li class="active"><a style="cursor: pointer;" onclick="carregarPagina('pedidos-admin')">📦 Dashboard Pedidos</a></li>
-                <li><a style="cursor: pointer;" onclick="carregarPagina('perfil-funcionario')">👤 Meu Perfil</a></li>
-                <li><a style="cursor: pointer;" onclick="carregarPagina('quadro-funcionario')">📄 Quadro de Funcionários</a></li>
-                <li><a style="cursor: pointer;" onclick="carregarPagina('home')">↪ Sair</a></li>
+                <li><a href="#" id="nav-admin-perfil">👤 Meu Perfil</a></li>
+                <li class="active"><a href="#" id="nav-admin-funcionarios">👥 FUNCIONÁRIOS</a></li>
+                <li><a href="#" id="nav-admin-sair">↪ Sair</a></li>
             </ul>
         </aside>
+
         <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
         <section class="admin-main-content">
             <h2>Conta do Funcionário</h2>
