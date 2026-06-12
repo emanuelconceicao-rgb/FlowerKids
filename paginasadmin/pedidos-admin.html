@@ -1,163 +1,24 @@
 <style>
-    /* Oculta elementos da loja padrão (ajuste as classes se necessário) */
-    
-    .main-header,
-    .shop-nav,
-    .cart-sidebar,
-    .footer-padrao,
-    nav,
-    .nav-container,
-    .menu-categorias,
-    .nav-items {
-        display: none !important;
-    }
-    /* Reseta o padding do main-content caso haja algum da loja */
-    
-    .main-content {
-        padding: 0 !important;
-        margin: 0 !important;
-        max-width: 100% !important;
-    }
-    /* Variáveis de Cor do Tema Admin */
-    
      :root {
-        --admin-bg: #e4eed8;
-        --admin-header-bg: #5f7a3f;
+        --admin-card-bg: #ffffff;
         --admin-text-dark: #333333;
         --admin-text-muted: #6b6b6b;
-        --admin-border: #728c52;
-    }
-    /* Container Principal da Tela Admin */
-    
-    .admin-dashboard-wrapper {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        background-color: var(--admin-bg);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: var(--admin-text-dark);
-    }
-    /* ---------------- HEADER ADMIN ---------------- */
-    
-    .admin-topbar {
-        background-color: var(--admin-header-bg);
-        color: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 40px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        --admin-border: #e0d6d6;
     }
     
-    .admin-topbar-left {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .admin-topbar-left img {
-        height: 50px;
-        background: white;
-        border-radius: 50%;
-        padding: 5px;
-    }
-    
-    .admin-topbar-left h1 {
-        font-size: 24px;
-        font-weight: 500;
-        margin: 0;
-        letter-spacing: 1px;
-    }
-    
-    .admin-topbar-right {
-        display: flex;
-        gap: 20px;
-        font-size: 24px;
-        cursor: pointer;
-    }
-    /* ---------------- CORPO ADMIN (Sidebar + Conteúdo) ---------------- */
-    
-    .admin-body {
-        display: flex;
-        flex: 1;
-        padding: 0;
-    }
-    /* ---------------- MENU LATERAL (Sidebar) ---------------- */
-    
-    .admin-sidebar {
-        width: 250px;
-        background-color: #f1f8e9;
-        border-right: 1px solid #cddbc0;
-        padding: 30px 0;
-    }
-    
-    .admin-sidebar h3 {
-        padding: 0 25px;
-        font-size: 16px;
-        color: var(--admin-text-dark);
-        margin-bottom: 20px;
-    }
-    
-    .admin-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .admin-menu li {
-        margin-bottom: 5px;
-    }
-    
-    .admin-menu a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 25px;
-        text-decoration: none;
-        color: var(--admin-text-dark);
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-    
-    .admin-menu a:hover {
-        background-color: #e4eed8;
-    }
-    
-    .admin-menu li.active a {
-        background-color: var(--admin-header-bg);
-        color: white;
-        border-radius: 0 20px 20px 0;
-        margin-right: 20px;
-    }
-    /* ---------------- CONTEÚDO PRINCIPAL ---------------- */
-    
-    .admin-main-content {
-        flex: 1;
-        padding: 40px;
-        background-color: var(--admin-bg);
-    }
-    
-    .admin-main-content h2 {
-        font-size: 22px;
-        margin-bottom: 25px;
-        color: var(--admin-text-dark);
-    }
-    /* Grid de Cards */
-    
-    .admin-cards-grid {
+    .admin-cards-container {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 20px;
+        margin-bottom: 30px;
     }
-    /* Cards Estilo Retângulo Arredondado */
     
     .admin-card {
+        background-color: var(--admin-card-bg);
         border: 1px solid var(--admin-border);
-        border-radius: 12px;
-        padding: 25px;
-        background-color: rgba(255, 255, 255, 0.4);
-        /* Fundo levemente branco para destacar */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     }
     
     .admin-card.full-width {
@@ -165,20 +26,19 @@
     }
     
     .admin-card-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: var(--admin-text-dark);
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: var(--admin-text-muted);
+        margin-bottom: 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
-    /* Estilos para os números de resumo */
     
     .summary-number {
-        font-size: 36px;
+        font-size: 2.5rem;
         font-weight: bold;
-        margin-top: 10px;
     }
     
     .text-danger {
@@ -186,67 +46,33 @@
     }
     
     .text-success {
-        color: #4a5d23;
+        color: #5f7a3f;
     }
 </style>
 
-<div class="admin-dashboard-wrapper">
+<div class="admin-cards-container">
+    <div class="admin-card">
+        <div class="admin-card-title">Pedidos Pendentes 📦</div>
+        <div class="summary-number text-danger" id="admin-count-pendentes">0</div>
+        <small style="color: var(--admin-text-muted);">Pedidos que precisam de atenção</small>
+    </div>
 
-    <header class="admin-topbar">
-        <div class="admin-topbar-left">
-            <img src="https://ui-avatars.com/api/?name=FK&background=fff&color=5f7a3f&rounded=true" alt="Logo">
-            <h1>Admin</h1>
+    <div class="admin-card">
+        <div class="admin-card-title">Entregues Hoje ✅</div>
+        <div class="summary-number text-success" id="admin-count-entregues">0</div>
+        <small style="color: var(--admin-text-muted);">Pedidos finalizados com sucesso</small>
+    </div>
+
+    <div class="admin-card full-width">
+        <div class="admin-card-title">
+            <span>Fila de Pedidos Pendentes</span>
+            <button style="padding: 6px 12px; background: #5f7a3f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;" onclick="window.carregarPagina('pedidos-admin')">Atualizar Banco</button>
         </div>
-        <div class="admin-topbar-right">
-            <span>🔔</span>
-            <span>👤</span>
-        </div>
-    </header>
 
-    <div class="admin-body">
-        <aside class="admin-sidebar">
-            <h3>Gestão da Loja</h3>
-            <ul class="admin-menu">
-                <li class="active"><a style="cursor: pointer;" onclick="carregarPagina('pedidos-admin')">📦 Dashboard Pedidos</a></li>
-                <li><a style="cursor: pointer;" onclick="carregarPagina('perfil-funcionario')">👤 Meu Perfil</a></li>
-                <li><a style="cursor: pointer;" onclick="carregarPagina('quadro-funcionario')">📄 Quadro de Funcionários</a></li>
-                <li><a style="cursor: pointer;" onclick="carregarPagina('home')">↪ Sair</a></li>
-            </ul>
-        </aside>
-
-        <section class="admin-main-content">
-            <h2>Dashboard de Pedidos</h2>
-
-            <div class="admin-cards-grid">
-
-                <div class="admin-card">
-                    <div class="admin-card-title">Aguardando Envio ⏳</div>
-                    <div class="summary-number text-danger" id="admin-count-pendentes">0</div>
-                    <small style="color: var(--admin-text-muted);">Pedidos que precisam de atenção</small>
-                </div>
-
-                <div class="admin-card">
-                    <div class="admin-card-title">Entregues Hoje ✅</div>
-                    <div class="summary-number text-success" id="admin-count-entregues">0</div>
-                    <small style="color: var(--admin-text-muted);">Pedidos finalizados com sucesso</small>
-                </div>
-
-                <div class="admin-card full-width">
-                    <div class="admin-card-title">
-                        <span>Fila de Pedidos Pendentes</span>
-                        <button style="padding: 6px 12px; background: var(--admin-header-bg); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;" onclick="window.location.reload()">Atualizar</button>
-                    </div>
-
-                    <div id="container-pedidos-admin" style="display: flex; flex-direction: column; gap: 15px; min-height: 200px;">
-
-                        <div style="text-align: center; color: var(--admin-text-muted); padding: 40px;">
-                            <span style="font-size: 24px; display: block; margin-bottom: 10px;">📦</span> Buscando pedidos recentes no banco de dados...
-                        </div>
-
-                    </div>
-                </div>
-
+        <div id="container-pedidos-admin" style="display: flex; flex-direction: column; gap: 15px; min-height: 200px;">
+            <div style="text-align: center; color: var(--admin-text-muted); padding: 40px;">
+                <span style="font-size: 24px; display: block; margin-bottom: 10px;">📦</span> Buscando pedidos recentes no banco de dados...
             </div>
-        </section>
+        </div>
     </div>
 </div>

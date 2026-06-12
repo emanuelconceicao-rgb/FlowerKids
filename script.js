@@ -1,19 +1,28 @@
 // ==========================================
-// 1. IMPORTAÇÕES E CONFIGURAÇÃO DO FIREBASE
+// 1. IMPORTAÇÕES DOS MÓDULOS LOCAIS E FIREBASE
 // ==========================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { auth, db } from "./firebase-config.js";
+import { CATALOGO } from "./catalogo.js";
 import {
-    getAuth,
+    carregarDashboardPedidosAdmin,
+    carregarQuadroDeFuncionarios,
+    carregarFiltroPedidosAdmin,
+    executarProcessoCancellation,
+    calcularEExibirFaturamentoDoDia,
+    cadastrarNovoFuncionarioNoBanco
+} from "./admin.js";
+
+import {
     signInWithEmailAndPassword,
     signOut,
     sendPasswordResetEmail,
     createUserWithEmailAndPassword,
     onAuthStateChanged,
     updatePassword,
-    verifyBeforeUpdateEmail
+    getAuth
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 import {
-    getFirestore,
     doc,
     setDoc,
     getDoc,
@@ -22,204 +31,79 @@ import {
     addDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// SUAS CHAVES DO FIREBASE ATUALIZADAS:
-const firebaseConfig = {
-    apiKey: "AIzaSyBBV0sVrQYOtSquWJUYMMfB0ySEdhbSsw0",
-    authDomain: "flower-kids.firebaseapp.com",
-    projectId: "flower-kids",
-    storageBucket: "flower-kids.firebasestorage.app",
-    messagingSenderId: "697591788058",
-    appId: "1:697591788058:web:05102c66ac3019369ad7a3"
-};
-
-// Inicializando os serviços
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
 // ==========================================
-// DADOS COMPLETOS DOS PRODUTOS (CATÁLOGO)
+// 2. VARIÁVEIS DE ESTADO GLOBAL DO SISTEMA
 // ==========================================
-const CATALOGO = {
-    "mais-vendidos": [
-        { nome: "Buquê com 6 rosas", desc: "", preco: "R$180,00", icone: "💐" },
-        { nome: "Kit rosas + ursinho + Ferrero Rocher", desc: "", preco: "R$230,00", icone: "🎁" },
-        { nome: "Buquê 24 rosas vermelhas", desc: "", preco: "R$420,00", icone: "🌹" },
-        { nome: "Buquê rosas e girassóis", desc: "", preco: "R$350,00", icone: "🌻" },
-        { nome: "Kit girassóis + Ferrero Rocher", desc: "", preco: "R$200,00", icone: "🌻" }
-    ],
-    "home-mega": [
-        { nome: "Mega buquê 500 rosas vermelhas", desc: "", preco: "R$5.700", icone: "💐" },
-        { nome: "Mega buquê 100 girassóis", desc: "", preco: "R$2.000", icone: "🌻" },
-        { nome: "Super coração 550 rosas vermelhas", desc: "", preco: "R$6.980", icone: "❤️" },
-        { nome: "Mega buquê 500 rosas rosas", desc: "", preco: "R$5.400", icone: "🌸" },
-        { nome: "Mega buquê 500 rosas mescladas + lavanda", desc: "", preco: "R$5.950", icone: "🪻" }
-    ],
-    "flores-avulsas": [
-        { nome: "Lírio amarelo", desc: "-Unidade", preco: "R$30,00", icone: "💛" },
-        { nome: "Lírio branco", desc: "-Unidade", preco: "R$30,00", icone: "🤍" },
-        { nome: "Eucalipto", desc: "- maço", preco: "R$50,00", icone: "🌿" },
-        { nome: "Rosa rosa", desc: "-Unidade", preco: "R$15,00", icone: "🌸" },
-        { nome: "Rosa Azul", desc: "-Unidade", preco: "R$15,00", icone: "💙" },
-        { nome: "Rosa vermelha", desc: "-Unidade", preco: "R$15,00", icone: "🌹" },
-        { nome: "Rosa Branca", desc: "-Unidade", preco: "R$15,00", icone: "🤍" },
-        { nome: "Girassol", desc: "-Unidade", preco: "R$12,00", icone: "🌻" },
-        { nome: "Tulipa Rosa", desc: "-Unidade", preco: "R$20,00", icone: "🌷" },
-        { nome: "Tulipa Branca", desc: "-Unidade", preco: "R$20,00", icone: "🌷" },
-        { nome: "Mosquitinhos", desc: "-- maço", preco: "R$8,00", icone: "🌾" },
-        { nome: "Cravo vermelho", desc: "-Unidade", preco: "R$12,00", icone: "🎈" },
-        { nome: "Cravo branco", desc: "-Unidade", preco: "R$12,00", icone: "🏳️" },
-        { nome: "Alstroemelia Amarela", desc: "- Galho", preco: "R$8,00", icone: "💛" },
-        { nome: "Alstroemelia Branco", desc: "- Galho", preco: "R$8,00", icone: "🤍" }
-    ],
-    "arranjos": [
-        { nome: "Arranjo de rosas vermelhas e rosas no vidro", desc: "R$265,00", preco: "R$265,00", icone: "🏺" },
-        { nome: "Arranjo de Alstroemelias Brancas no Vidro", desc: "R$109,90", preco: "R$109,90", icone: "🏺" },
-        { nome: "Arranjo de rosas multicoloridas no vidro", desc: "R$250,00", preco: "R$250,00", icone: "🏺" },
-        { nome: "Arranjo de Margaridas no Vidro", desc: "R$98,00", preco: "R$98,00", icone: "🏺" },
-        { nome: "Arranjo de flores nobres no vaso de vidro grande", desc: "R$220,00", preco: "R$220,00", icone: "🏺" },
-        { nome: "Arranjo de rosas coloridas no vidro + Ferrero Rocher", desc: "R$309,00", preco: "R$309,00", icone: "🍫" },
-        { nome: "Arranjo de Margaridas plantada", desc: "R$74,00", preco: "R$74,00", icone: "🪴" },
-        { nome: "Arranjo de Margaridas Folhagem", desc: "R$89,90", preco: "R$89,90", icone: "🪴" },
-        { nome: "Arranjo com 24 rosas vermelhas", desc: "R$490,90", preco: "R$490,90", icone: "🌹" },
-        { nome: "Arranjo com 12 rosas azuis", desc: "R$290,00", preco: "R$290,00", icone: "💙" },
-        { nome: "Lírio rosa plantado", desc: "R$120,00", preco: "R$120,00", icone: "🪴" },
-        { nome: "Arranjo de Alstroemelias Coloridas no Vidro", desc: "R$110,00", preco: "R$110,00", icone: "🏺" },
-        { nome: "Arranjo de girassóis no vidro", desc: "R$128,00", preco: "R$128,00", icone: "🌻" },
-        { nome: "Arranjo de flores nobres com Ferrero Rocher no vidro", desc: "R$230,00", preco: "R$230,00", icone: "🍫" },
-        { nome: "Arranjo de rosas vermelhas no vidro", desc: "R$149,00", preco: "R$149,00", icone: "🏺" }
-    ],
-    "buques": [
-        { nome: "Buquê com 6 rosas", desc: "", preco: "R$180,00", icone: "💐" },
-        { nome: "Buquê de margaridas", desc: "", preco: "R$190,00", icone: "🌼" },
-        { nome: "Buquê 24 rosas vermelhas", desc: "", preco: "R$420,00", icone: "🌹" },
-        { nome: "Buquê rosas e girassóis", desc: "", preco: "R$350,00", icone: "🌻" },
-        { nome: "Buquê de Rosas com Alstroemélias", desc: "", preco: "R$148,80", icone: "💐" },
-        { nome: "Buquê de rosas + ursinho + Ferrero", desc: "", preco: "R$299,90", icone: "🧸" },
-        { nome: "Buquê 12 Rosas Rosa", desc: "", preco: "R$174,90", icone: "🌸" },
-        { nome: "Buquê com 24 rosas vermelhas e brancas", desc: "", preco: "R$309,90", icone: "🌹" },
-        { nome: "Buquê de Alstroemélias", desc: "", preco: "R$149,90", icone: "💐" },
-        { nome: "Buquê de flores silvestres", desc: "", preco: "R$219,90", icone: "🌱" },
-        { nome: "Buquê de flores diversas", desc: "", preco: "R$250,00", icone: "💐" },
-        { nome: "Buquê Gerberas", desc: "", preco: "R$224,91", icone: "🌸" },
-        { nome: "Buquê Rosas coloridas", desc: "", preco: "R$124,90", icone: "💐" },
-        { nome: "Buquê de Flores Mistas", desc: "", preco: "R$250,00", icone: "✨" },
-        { nome: "Buquê de Gérberas e Astromélias", desc: "", preco: "R$99,90", icone: "🌼" }
-    ],
-    "cestas": [
-        { nome: "Cesta de Café com Urso Flores e Caneca", desc: "", preco: "R$279,88", icone: "🧺" },
-        { nome: "Cesta de café da manhã clássica", desc: "", preco: "R$210,00", icone: "🧺" },
-        { nome: "Cesta Um Montão de Guloseimas", desc: "", preco: "R$198,00", icone: "🍪" },
-        { nome: "Cesta de café da manhã vinho e frutas", desc: "", preco: "R$233,00", icone: "🍷" },
-        { nome: "Cesta com 15 Rosas Vermelhas Chocolate e Vinho Tinto", desc: "", preco: "R$298,00", icone: "🍷" },
-        { nome: "Cesta de Cervejas - Budweiser", desc: "", preco: "R$171,90", icone: "🍺" },
-        { nome: "Cesta de Cervejas - Corona", desc: "", preco: "R$199,90", icone: "🍺" }
-    ],
-    "kit-presente": [
-        { nome: "Kit Orquídea", desc: "", preco: "R$319,90", icone: "🪴" },
-        { nome: "Kit rosas + ursinho + Ferrero Rocher", desc: "", preco: "R$230,00", icone: "🧸" },
-        { nome: "Amor Intenso Amor", desc: "", preco: "R$239,90", icone: "❤️" },
-        { nome: "Kit Chocolates e Rosas", desc: "", preco: "R$179,90", icone: "🍫" },
-        { nome: "Kit girassóis + Ferrero Rocher", desc: "", preco: "R$200,00", icone: "🌻" },
-        { nome: "Cesta Explosão de Amor", desc: "", preco: "R$274,00", icone: "🧺" },
-        { nome: "Kit Romântico com Ursinho", desc: "", preco: "R$409,90", icone: "🧸" },
-        { nome: "Caixa Rosas, Vinho e Chocolate", desc: "", preco: "R$209,00", icone: "🍷" },
-        { nome: "Cesta do Amor", desc: "", preco: "R$298,90", icone: "🧺" },
-        { nome: "Cesta de Frutas e Vinho", desc: "", preco: "R$233,90", icone: "🍷" }
-    ],
-    "mega-buques": [
-        { nome: "Mega Buquê Lilás", desc: "", preco: "R$650,00", icone: "🪻" },
-        { nome: "Mega Buquê Azul", desc: "", preco: "R$780,00", icone: "💙" },
-        { nome: "Super coração 550 rosas vermelhas", desc: "", preco: "R$6.980", icone: "❤️" },
-        { nome: "Mega buquê 500 rosas rosas", desc: "", preco: "R$5.400", icone: "🌸" },
-        { nome: "Mega buquê 500 rosas mescladas + lavanda", desc: "", preco: "R$5.950", icone: "💐" },
-        { nome: "Mega buquê 500 rosas vermelhas", desc: "", preco: "R$5.700", icone: "🌹" },
-        { nome: "Mega buquê 100 girassóis", desc: "", preco: "R$2.000", icone: "🌻" }
-    ]
-};
-
-let todosProdutos = [];
-Object.values(CATALOGO).forEach(lista => {
-    lista.forEach(prod => {
-        if (!todosProdutos.some(p => p.nome === prod.nome)) {
-            todosProdutos.push(prod);
-        }
-    });
-});
-
-let buscasRecentes = JSON.parse(localStorage.getItem("fk_recentes")) || [];
 let usuarioEstaLogado = false;
-let usuarioEFuncionario = false; // FLAG DE DIFERENCIAÇÃO ADMINISTRATIVA
+let usuarioEFuncionario = false;
+let paginaAtual = 'home';
 let carrinho = [];
-let checkoutMetodoPagamento = "pix";
-let paginaAtual = "";
+let checkoutMetodoPagamento = 'pix'; // Padrão inicial
 
 // ==========================================
-// MONITOR DE SESSÃO DO FIREBASE SEGURO E COM IDENTIFICAÇÃO DE CARGO
+// 3. MONITOR DE SESSÃO DO FIREBASE SEGURO
 // ==========================================
-onAuthStateChanged(auth, async(user) => {
+onAuthStateChanged(auth, function(user) {
     if (user) {
         usuarioEstaLogado = true;
         usuarioEFuncionario = false;
-        let nomeExibicao = (user.email && typeof user.email === "string") ? user.email.split('@')[0].toUpperCase() : "CONTA";
-        let preferencesData = { email: false, whatsapp: false };
+        var nomeExibicao = (user.email && typeof user.email === "string") ? user.email.split('@')[0].toUpperCase() : "CONTA";
+        var preferencesData = { email: false, whatsapp: false };
 
-        try {
-            // 1. Tenta identificar se o usuário está cadastrado na coleção de Funcionários
-            const funcDoc = await getDoc(doc(db, "funcionarios", user.uid));
-            if (funcDoc.exists()) {
-                usuarioEFuncionario = true;
-                const d = funcDoc.data();
-                if (d && d.nome) nomeExibicao = d.nome;
-            } else {
-                // 2. Se não for funcionário, puxa os dados de Cliente normal
-                const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-                if (userDoc.exists()) {
-                    const dadosFstore = userDoc.data();
-                    if (dadosFstore && dadosFstore.nome) nomeExibicao = dadosFstore.nome;
-                    if (dadosFstore && dadosFstore.preferencias) preferencesData = dadosFstore.preferencias;
+        // 1. Tenta identificar se o usuário está na coleção dedicada de Funcionários
+        getDoc(doc(db, "funcionarios", user.uid))
+            .then(function(funcDoc) {
+                if (funcDoc.exists()) {
+                    usuarioEFuncionario = true;
+                    localStorage.setItem("isFunc", "true");
+                    var d = funcDoc.data();
+                    if (d && d.nome) nomeExibicao = d.nome;
 
-                    // Backup de segurança: se na tabela usuários ele tiver cargo de funcionário
-                    if (dadosFstore && dadosFstore.cargo === "funcionario") {
-                        usuarioEFuncionario = true;
+                    if (paginaAtual === 'home' || paginaAtual === 'login') {
+                        carregarPagina('home-admin');
                     }
+                    atualizarComponentesInterface(nomeExibicao, preferencesData, user.email);
+                } else {
+                    // 2. Se não estiver lá, puxa da coleção de usuários comuns
+                    getDoc(doc(db, "usuarios", user.uid))
+                        .then(function(userDoc) {
+                            if (userDoc.exists()) {
+                                var dadosFstore = userDoc.data();
+                                if (dadosFstore && dadosFstore.nome) nomeExibicao = dadosFstore.nome;
+                                if (dadosFstore && dadosFstore.preferencias) preferencesData = dadosFstore.preferencias;
+
+                                // CORREÇÃO OPERACIONAL: Aceita "funcionario" ou "administrador" vindo do Firestore
+                                if (dadosFstore && (dadosFstore.cargo === "funcionario" || dadosFstore.cargo === "administrador")) {
+                                    usuarioEFuncionario = true;
+                                    localStorage.setItem("isFunc", "true");
+                                    if (paginaAtual === 'home' || paginaAtual === 'login') {
+                                        carregarPagina('home-admin');
+                                    }
+                                }
+                            }
+                            atualizarComponentesInterface(nomeExibicao, preferencesData, user.email);
+                        })
+                        .catch(function(err) {
+                            console.error("Erro ao ler dados da coleção usuarios:", err);
+                            atualizarComponentesInterface(nomeExibicao, preferencesData, user.email);
+                        });
                 }
-            }
-        } catch (e) {
-            console.error("Erro ao carregar dados do Firestore:", e);
-        }
+            })
+            .catch(function(e) {
+                console.error("Erro ao carregar dados do Firestore:", e);
+                atualizarComponentesInterface(nomeExibicao, preferencesData, user.email);
+            });
 
-        const labelAccount = document.getElementById("account-label");
-        if (labelAccount) {
-            if (usuarioEFuncionario) {
-                labelAccount.innerText = "ADMIN";
-            } else if (nomeExibicao && typeof nomeExibicao === "string" && nomeExibicao.trim() !== "") {
-                labelAccount.innerText = nomeExibicao.split(" ")[0].toUpperCase();
-            } else {
-                labelAccount.innerText = "CONTA";
-            }
-        }
-
-        const inputPerfilNome = document.getElementById("perfil-nome");
-        const inputPerfilEmail = document.getElementById("perfil-email");
-        const chkPrefEmail = document.getElementById("pref-email");
-        const chkPrefWhats = document.getElementById("pref-whatsapp");
-
-        if (inputPerfilNome) inputPerfilNome.value = nomeExibicao;
-        if (inputPerfilEmail) inputPerfilEmail.value = user.email || "";
-        if (chkPrefEmail) chkPrefEmail.checked = !!preferencesData.email;
-        if (chkPrefWhats) chkPrefWhats.checked = !!preferencesData.whatsapp;
-
-        carregarEnderecosUsuario();
-        carregarPedidosUsuario();
     } else {
         usuarioEstaLogado = false;
         usuarioEFuncionario = false;
-        const labelAcc = document.getElementById("account-label");
+        localStorage.removeItem("isFunc");
+
+        var labelAcc = document.getElementById("account-label");
         if (labelAcc) labelAcc.innerText = "CONTA";
 
-        const inputPerfilNome = document.getElementById("perfil-nome");
-        const inputPerfilEmail = document.getElementById("perfil-email");
+        var inputPerfilNome = document.getElementById("perfil-nome");
+        var inputPerfilEmail = document.getElementById("perfil-email");
         if (inputPerfilNome) inputPerfilNome.value = "";
         if (inputPerfilEmail) inputPerfilEmail.value = "";
 
@@ -228,21 +112,46 @@ onAuthStateChanged(auth, async(user) => {
     }
 });
 
+// Função auxiliar interna para não duplicar código de renderização de tela
+function atualizarComponentesInterface(nomeExibicao, preferencesData, emailUsuario) {
+    var labelAccount = document.getElementById("account-label");
+    if (labelAccount) {
+        if (usuarioEFuncionario) {
+            labelAccount.innerText = "ADMIN";
+        } else if (nomeExibicao && typeof nomeExibicao === "string" && nomeExibicao.trim() !== "") {
+            labelAccount.innerText = nomeExibicao.split(" ")[0].toUpperCase();
+        } else {
+            labelAccount.innerText = "CONTA";
+        }
+    }
+
+    var inputPerfilNome = document.getElementById("perfil-nome");
+    var inputPerfilEmail = document.getElementById("perfil-email");
+    var chkPrefEmail = document.getElementById("pref-email");
+    var chkPrefWhats = document.getElementById("pref-whatsapp");
+
+    if (inputPerfilNome) inputPerfilNome.value = nomeExibicao;
+    if (inputPerfilEmail) inputPerfilEmail.value = emailUsuario || "";
+    if (chkPrefEmail) chkPrefEmail.checked = !!preferencesData.email;
+    if (chkPrefWhats) chkPrefWhats.checked = !!preferencesData.whatsapp;
+
+    carregarEnderecosUsuario();
+    carregarPedidosUsuario();
+}
 // ==========================================
-// NAVEGAÇÃO DINÂMICA SPA (ROTEAMENTO INTELIGENTE)
+// 4. NAVEGAÇÃO DINÂMICA SPA (ROTEAMENTO INTELIGENTE)
 // ==========================================
-async function carregarPagina(nomePagina, subviewOpcional = null, contextData = null) {
+export async function carregarPagina(nomePagina, subviewOpcional = null, contextData = null) {
     const mainContent = document.querySelector('.main-content');
     if (!mainContent) return;
-    paginaAtual = nomePagina;
 
+    // Determina a pasta correta baseada no nome da página
     let pastaDestino = "paginas";
-
-    // Configuração para aceitar as páginas da pasta paginasadmin
     const paginasAdmin = [
         'home-admin',
         'pedidos-admin',
         'quadro-funcionario',
+        'cadastro-funcionario',
         'pedidos-entregues',
         'cancelar-pedido',
         'faturamento-dia'
@@ -252,24 +161,54 @@ async function carregarPagina(nomePagina, subviewOpcional = null, contextData = 
         pastaDestino = "paginasadmin";
     }
 
+    // CORREÇÃO AQUI: Verifica a variável global OU se o status está salvo no localStorage
+    const estaSalvoComoAdmin = localStorage.getItem("isFunc") === "true";
+
+    if (paginasAdmin.includes(nomePagina) && !usuarioEFuncionario && !estaSalvoComoAdmin) {
+        console.warn("Bloqueio de segurança: Usuário não identificado como Admin.");
+        carregarPagina('home');
+        return;
+    }
+
+    paginaAtual = nomePagina;
+
     try {
-        const resposta = await fetch(`${pastaDestino}/${nomePagina}.html`);
-        if (!resposta.ok) throw new Error(`Erro ao carregar fragmento: ${nomePagina}`);
+        const resposta = await fetch(`./${pastaDestino}/${nomePagina}.html`);
+        if (!resposta.ok) throw new Error(`Erro ao carregar o arquivo: ${nomePagina}.html`);
 
         const html = await resposta.text();
-        mainContent.innerHTML = html;
 
+        // Se for uma sub-página do painel admin, injeta dentro da área de conteúdo do admin
+        if (pastaDestino === "paginasadmin" && nomePagina !== 'home-admin') {
+            const subConteudo = document.getElementById('sub-conteudo-admin');
+            if (subConteudo) {
+                subConteudo.innerHTML = html;
+            } else {
+                // Se tentou carregar uma sub-página mas a casca do admin não está na tela, carrega a casca primeiro
+                mainContent.innerHTML = html;
+            }
+        } else {
+            // Páginas normais da loja ou a própria 'home-admin' (casca principal)
+            mainContent.innerHTML = html;
+        }
+
+        // Executa as funções de inicialização dos componentes
         initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData);
-        window.scrollTo(0, 0);
+
+        // Se acabamos de entrar na casca do admin, força o carregamento do dashboard interno padrão
+        if (nomePagina === 'home-admin') {
+            carregarPagina('pedidos-admin');
+        }
 
     } catch (erro) {
-        console.error("Falha no carregamento SPA:", erro);
-        mainContent.innerHTML = `<p style="text-align:center; padding:40px; color:#727e5f;">Não foi possível processar a navegação da página. Verifique seus arquivos locais. 🥀</p>`;
+        console.error("Erro no roteamento SPA:", erro);
+        mainContent.innerHTML = `<p style="text-align:center; padding:50px; color:#a83232;">Página temporariamente indisponível: ${nomePagina}</p>`;
     }
 }
-
+// Torna a navegação global para ser acessada pelo admin.js e elementos HTML inline
+window.carregarPagina = carregarPagina;
 // ==========================================
-// INICIALIZADOR DOS COMPONENTES E TELAS
+// 5. INICIALIZADOR DOS COMPONENTES E TELAS
 // ==========================================
 function initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData) {
     // ---- TELAS DE CLIENTES ----
@@ -358,7 +297,7 @@ function initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData) 
     }
 
     if (nomePagina === 'checkout') {
-        if (typeof renderizarResumoCheckout === "function") renderizarResumoCheckout();
+        renderizarResumoCheckout();
 
         const btnIrEntrega = document.getElementById("btn-ir-entrega");
         if (btnIrEntrega) {
@@ -366,12 +305,12 @@ function initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData) 
                 const nome = document.getElementById("chk-nome") ? document.getElementById("chk-nome").value.trim() : "";
                 const cpf = document.getElementById("chk-cpf") ? document.getElementById("chk-cpf").value.trim() : "";
                 if (!nome || !cpf) return alert("Nome e CPF são obrigatórios!");
-                if (typeof switchCheckoutStep === "function") switchCheckoutStep(2);
+                switchCheckoutStep(2);
             });
         }
 
         const btnChkVolt2 = document.getElementById("btn-chk-voltar-2");
-        if (btnChkVolt2) btnChkVolt2.addEventListener("click", () => typeof switchCheckoutStep === "function" && switchCheckoutStep(1));
+        if (btnChkVolt2) btnChkVolt2.addEventListener("click", () => switchCheckoutStep(1));
 
         const btnIrPagamento = document.getElementById("btn-ir-pagamento");
         if (btnIrPagamento) {
@@ -379,12 +318,12 @@ function initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData) 
                 const rua = document.getElementById("chk-rua") ? document.getElementById("chk-rua").value.trim() : "";
                 const num = document.getElementById("chk-num") ? document.getElementById("chk-num").value.trim() : "";
                 if (!rua || !num) return alert("Por favor, preencha todos os dados de entrega obrigatórios!");
-                if (typeof switchCheckoutStep === "function") switchCheckoutStep(3);
+                switchCheckoutStep(3);
             });
         }
 
         const btnChkVolt3 = document.getElementById("btn-chk-voltar-3");
-        if (btnChkVolt3) btnChkVolt3.addEventListener("click", () => typeof switchCheckoutStep === "function" && switchCheckoutStep(2));
+        if (btnChkVolt3) btnChkVolt3.addEventListener("click", () => switchCheckoutStep(2));
 
         document.querySelectorAll(".pay-tab-btn").forEach(tab => {
             tab.addEventListener("click", (e) => {
@@ -394,7 +333,7 @@ function initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData) 
                 checkoutMetodoPagamento = e.currentTarget.getAttribute("data-method");
                 const panel = document.getElementById(`pay-panel-${checkoutMetodoPagamento}`);
                 if (panel) panel.classList.add("active");
-                if (typeof renderizarResumoCheckout === "function") renderizarResumoCheckout();
+                renderizarResumoCheckout();
             });
         });
 
@@ -404,39 +343,48 @@ function initEventosEProdutosDaPagina(nomePagina, subviewOpcional, contextData) 
 
     // ---- TELAS ADMINISTRATIVAS ----
     if (nomePagina === 'quadro-funcionario') {
-        if (typeof carregarQuadroDeFuncionarios === "function") carregarQuadroDeFuncionarios();
+        carregarQuadroDeFuncionarios(document);
         const navIrNovoFunc = document.getElementById("nav-ir-novo-func");
         if (navIrNovoFunc) navIrNovoFunc.addEventListener("click", () => carregarPagina('cadastro-funcionario'));
     }
 
     if (nomePagina === 'pedidos-admin') {
-        // Carrega os dados do Firebase direto para os novos cards do Dashboard
-        carregarDashboardPedidosAdmin();
+        carregarDashboardPedidosAdmin(document);
     }
 
     if (nomePagina === 'pedidos-entregues') {
-        if (typeof carregarFiltroPedidosAdmin === "function") carregarFiltroPedidosAdmin("Entregue", "container-pedidos-entregues-admin");
+        // CORREÇÃO: Chama a nova função global passando o status "Entregue" e o elemento alvo correto
+        carregarFiltroPedidosAdmin(document, 'Entregue');
+
         const navPedidosAtivosVoltar = document.getElementById("nav-pedidos-ativos-voltar");
-        if (navPedidosAtivosVoltar) navPedidosAtivosVoltar.addEventListener("click", () => carregarPagina('pedidos-admin'));
+        if (navPedidosAtivosVoltar) {
+            navPedidosAtivosVoltar.addEventListener("click", () => carregarPagina('pedidos-admin'));
+        }
     }
 
     if (nomePagina === 'cancelar-pedido') {
+        // BÔNUS: Adicionei esta linha para listar os pedidos que podem ser cancelados caso precise na tela
+        carregarFiltroPedidosAdmin(document, 'Em preparação');
+
         const btnAbortarCancelamento = document.getElementById("btn-abortar-cancelamento");
-        if (btnAbortarCancelamento) btnAbortarCancelamento.addEventListener("click", () => carregarPagina('pedidos-admin'));
+        if (btnAbortarCancelamento) {
+            btnAbortarCancelamento.addEventListener("click", () => carregarPagina('pedidos-admin'));
+        }
 
         const btnConfirmarCancelamento = document.getElementById("btn-confirmar-cancelamento-banco");
-        if (btnConfirmarCancelamento && typeof executarProcessoCancellation === "function") btnConfirmarCancelamento.addEventListener("click", executarProcessoCancellation);
+        if (btnConfirmarCancelamento) {
+            btnConfirmarCancelamento.addEventListener("click", () => executarProcessoCancellation(document));
+        }
     }
 
     if (nomePagina === 'faturamento-dia') {
-        if (typeof calcularEExibirFaturamentoDoDia === "function") calcularEExibirFaturamentoDoDia();
+        calcularEExibirFaturamentoDoDia(document);
     }
 }
 
 // ==========================================
-// FUNÇÕES DE CARRINHO E INTERFACE
+// 6. FUNÇÕES DE CARRINHO E INTERFACE (CLIENTE)
 // ==========================================
-
 function renderGrid(containerId, productList) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -456,13 +404,11 @@ function renderGrid(containerId, productList) {
             <p class="product-price">${prod.preco}</p>
             <button class="btn-buy">Comprar</button>
         `;
-        // Lógica FALTANTE que foi adicionada para o botão Comprar
-        card.querySelector(".btn-buy").addEventListener("click", () => {
-            alert(prod.nome + " adicionado ao carrinho!");
 
+        card.querySelector(".btn-buy").addEventListener("click", () => {
+            // REMOVIDO: O alert antigo para a experiência ficar mais limpa
             const precoFormatado = parseFloat(prod.preco.replace("R$", "").replace(".", "").replace(",", "."));
 
-            // Verifica se o item já está no carrinho
             const itemExistente = carrinho.find(item => item.nome === prod.nome);
             if (itemExistente) {
                 itemExistente.quantidade++;
@@ -470,7 +416,11 @@ function renderGrid(containerId, productList) {
                 carrinho.push({ nome: prod.nome, preco: precoFormatado, icone: prod.icone, quantidade: 1 });
             }
 
+            // 1. Atualiza os itens e o número vermelho na barra superior
             atualizarInterfaceCarrinho();
+
+            // 2. ABRE O CARRINHO AO LADO AUTOMATICAMENTE
+            abrirCarrinho();
         });
         container.appendChild(card);
     });
@@ -479,17 +429,20 @@ function renderGrid(containerId, productList) {
 function atualizarInterfaceCarrinho() {
     const containerItens = document.getElementById("cart-items");
     const labelTotal = document.getElementById("cart-total-price");
+    const cartCountBadge = document.getElementById("cart-count"); // Puxa a badge do index.html
 
     if (!containerItens) return;
     containerItens.innerHTML = "";
 
     let totalPreco = 0;
+    let totalItens = 0; // Nova variável para contar as quantidades totais
 
     if (carrinho.length === 0) {
         containerItens.innerHTML = '<p class="cart-empty">Seu carrinho está vazio 🥀</p>';
     } else {
         carrinho.forEach((item, index) => {
             totalPreco += (item.preco * item.quantidade);
+            totalItens += item.quantidade; // Soma as unidades deste item ao total
 
             const div = document.createElement("div");
             div.className = "cart-item";
@@ -504,7 +457,6 @@ function atualizarInterfaceCarrinho() {
                 </div>
             `;
 
-            // Lógica para remover item do carrinho
             div.querySelector(".remove-btn").addEventListener("click", (e) => {
                 const i = e.currentTarget.getAttribute("data-index");
                 carrinho.splice(i, 1);
@@ -516,6 +468,16 @@ function atualizarInterfaceCarrinho() {
     }
 
     if (labelTotal) labelTotal.innerText = "R$ " + totalPreco.toFixed(2);
+
+    // GERENCIA O CONTADOR VERMELHO (BADGE) NA BARRA SUPERIOR
+    if (cartCountBadge) {
+        if (totalItens > 0) {
+            cartCountBadge.innerText = totalItens;
+            cartCountBadge.style.display = "block"; // Mostra o círculo vermelho
+        } else {
+            cartCountBadge.style.display = "none"; // Esconde se o carrinho for zerado
+        }
+    }
 }
 
 function abrirCarrinho() {
@@ -562,71 +524,126 @@ function renderizarResumoCheckout() {
     if (subtotalLabel) subtotalLabel.innerText = "R$ " + subtotal.toFixed(2);
     if (totalLabel) totalLabel.innerText = "R$ " + subtotal.toFixed(2);
 }
-
+// ==========================================
+// 7. OPERAÇÕES REQUISITADAS AO BANCO (CLIENTE)
+// ==========================================
 async function executarFinalizarCompraReal() {
     if (!auth.currentUser || carrinho.length === 0) return alert("Seu carrinho está vazio ou você não está logado!");
 
     let subtotal = 0;
     carrinho.forEach(item => { subtotal += (item.preco * item.quantidade); });
 
+    // 1. Tenta buscar o nome do cliente salvo no Firestore para o Admin conseguir ver no painel
+    let nomeClienteParaAdmin = "Cliente Consumidor";
     try {
-        await addDoc(collection(db, "usuarios", auth.currentUser.uid, "pedidos"), {
-            itens: carrinho,
-            total: subtotal,
-            metodoPagamento: checkoutMetodoPagamento,
-            status: "Em preparação",
-            dataPedido: new Date()
-        });
+        const userDoc = await getDoc(doc(db, "usuarios", auth.currentUser.uid));
+        if (userDoc.exists() && userDoc.data().nome) {
+            nomeClienteParaAdmin = userDoc.data().nome;
+        }
+    } catch (e) {
+        console.warn("Não foi possível obter o nome do cliente, usando padrão.", e);
+    }
+
+    // 2. Monta o objeto com todos os dados do pedido
+    const dadosDoPedido = {
+        itens: carrinho,
+        total: subtotal,
+        metodoPagamento: checkoutMetodoPagamento,
+        status: "Em preparação",
+        dataPedido: new Date(),
+        clienteId: auth.currentUser.uid,
+        nome: nomeClienteParaAdmin, // Usado pelo seu admin.js (pedido.nome)
+        clienteNome: nomeClienteParaAdmin // Usado pelo seu admin.js (pedido.clienteNome)
+    };
+
+    try {
+        // GRAVAÇÃO 1: Salva na coleção GLOBAL raiz (onde o seu carregarDashboardPedidosAdmin lê)
+        const referenciaPedidoGlobal = await addDoc(collection(db, "pedidos"), dadosDoPedido);
+        const novoPedidoId = referenciaPedidoGlobal.id;
+
+        // GRAVAÇÃO 2: Salva na subcoleção interna do usuário mantendo o exato MESMO ID de documento
+        await setDoc(doc(db, "usuarios", auth.currentUser.uid, "pedidos", novoPedidoId), dadosDoPedido);
+
+        // Limpa o carrinho e atualiza a interface
         carrinho = [];
         atualizarInterfaceCarrinho();
-        alert("Compra finalizada com sucesso!");
+
+        alert("Compra finalizada com sucesso! Seu pedido já está no painel administrativo. 🎉");
         carregarPagina("home");
     } catch (error) {
         console.error("Erro interno ao salvar pedido no Firebase:", error);
+        alert("Erro operacional ao registrar o pedido. Tente novamente.");
     }
 }
 
-// ==========================================
-// FUNÇÕES INTEGRADAS DE LÓGICA E BANCO DE DADOS
-// ==========================================
+function executarLoginInteligente(e) {
+    if (e) e.preventDefault();
 
-async function executarLoginInteligente() {
-    const emailInput = document.getElementById("login-email") || document.getElementById("admin-login-email");
-    const senhaInput = document.getElementById("login-senha") || document.getElementById("admin-login-senha");
+    var emailInput = document.getElementById("login-email");
+    var senhaInput = document.getElementById("login-senha");
 
-    if (!emailInput || !senhaInput) return;
+    var email = emailInput ? emailInput.value.trim() : "";
+    var senha = senhaInput ? senhaInput.value.trim() : "";
 
-    const email = emailInput.value.trim();
-    const senha = senhaInput.value.trim();
-
-    if (!email || !senha) return alert("Por favor, preencha as credenciais!");
-
-    try {
-        const cred = await signInWithEmailAndPassword(auth, email, senha);
-        const uid = cred.user.uid;
-
-        // Verifica se é administrador
-        const funcSnap = await getDoc(doc(db, "funcionarios", uid));
-        let isFunc = false;
-
-        if (funcSnap.exists()) {
-            isFunc = true;
-        } else {
-            const userSnap = await getDoc(doc(db, "usuarios", uid));
-            if (userSnap.exists() && userSnap.data().cargo === "funcionario") {
-                isFunc = true;
-            }
-        }
-
-        if (isFunc) {
-            alert("Acesso Administrativo Confirmado!");
-            carregarPagina('home-admin'); // <--- ALTERADO AQUI
-        } else {
-            carregarPagina('minha-conta', 'subview-perfil');
-        }
-    } catch (error) {
-        alert("Falha ao entrar: E-mail ou senha incorretos.");
+    if (!email || !senha) {
+        alert("Por favor, preencha todos os campos.");
+        return;
     }
+
+    signInWithEmailAndPassword(auth, email, senha)
+        .then(function(userCredential) {
+            var user = userCredential.user;
+            usuarioEstaLogado = true;
+            localStorage.setItem("usuarioLogado", user.uid);
+
+            // 1ª Etapa: Procura na coleção dedicada de funcionários
+            getDoc(doc(db, "funcionarios", user.uid))
+                .then(function(funcDoc) {
+                    if (funcDoc.exists()) {
+                        usuarioEFuncionario = true;
+                        localStorage.setItem("isFunc", "true");
+                        alert("Acesso administrativo concedido. Bem-vindo! 👑");
+                        carregarPagina('home-admin');
+                    } else {
+                        // 2ª Etapa: Procura em usuários comuns e aceita tanto "funcionario" quanto "administrador"
+                        getDoc(doc(db, "usuarios", user.uid))
+                            .then(function(userDoc) {
+                                if (userDoc.exists()) {
+                                    var dadosCargo = userDoc.data().cargo;
+
+                                    // AJUSTE OPERACIONAL: Valida os dois cargos administrativos legítimos
+                                    if (dadosCargo === "funcionario" || dadosCargo === "administrador") {
+                                        usuarioEFuncionario = true;
+                                        localStorage.setItem("isFunc", "true");
+                                        alert("Acesso administrativo concedido. Bem-vindo! 👑");
+                                        carregarPagina('home-admin');
+                                    } else {
+                                        usuarioEFuncionario = false;
+                                        localStorage.removeItem("isFunc");
+                                        alert("Login efetuado com sucesso!");
+                                        carregarPagina('home');
+                                    }
+                                } else {
+                                    usuarioEFuncionario = false;
+                                    localStorage.removeItem("isFunc");
+                                    alert("Login efetuado com sucesso!");
+                                    carregarPagina('home');
+                                }
+                            })
+                            .catch(function(err) {
+                                console.error("Erro ao ler dados do usuário:", err);
+                                carregarPagina('home');
+                            });
+                    }
+                })
+                .catch(function(err) {
+                    console.error("Erro na verificação de privilégios:", err);
+                });
+        })
+        .catch(function(error) {
+            console.error("Erro ao autenticar usuário:", error);
+            alert("Falha na autenticação: E-mail ou senha incorretos.");
+        });
 }
 
 async function executarSalvarPerfilCadastral() {
@@ -634,19 +651,17 @@ async function executarSalvarPerfilCadastral() {
     if (!user) return alert("Nenhum usuário autenticado!");
 
     const novoNome = document.getElementById("perfil-nome") ? document.getElementById("perfil-nome").value.trim() : "";
-    const novoEmail = document.getElementById("perfil-email") ? document.getElementById("perfil-email").value.trim() : "";
     const prefEmail = document.getElementById("pref-email") ? document.getElementById("pref-email").checked : false;
     const prefWhats = document.getElementById("pref-whatsapp") ? document.getElementById("pref-whatsapp").checked : false;
 
     if (!novoNome) return alert("O campo Nome não pode ficar vazio.");
-    if (!novoEmail) return alert("Insira um e-mail válido.");
 
     try {
         await setDoc(doc(db, "usuarios", user.uid), {
             nome: novoNome,
             preferencias: { email: prefEmail, whatsapp: prefWhats }
         }, { merge: true });
-        alert("Perfil atualizado com sucesso!");
+        alert("Perfil updated com sucesso!");
     } catch (e) {
         console.error("Erro ao salvar perfil:", e);
     }
@@ -667,8 +682,8 @@ async function executarSalvarEnderecoBanco() {
             endereco: { rua, numero, cep, cidade }
         }, { merge: true });
         alert("Endereço salvo com sucesso!");
-        if (typeof carregarEnderecosUsuario === "function") carregarEnderecosUsuario();
-        if (typeof switchSubView === "function") switchSubView("subview-enderecos");
+        carregarEnderecosUsuario();
+        switchSubView("subview-enderecos");
     } catch (error) {
         alert("Erro ao salvar endereço: " + error.message);
     }
@@ -805,203 +820,11 @@ async function carregarPedidosUsuario() {
 }
 
 // ==========================================
-// FUNÇÕES DO PAINEL DE ADMINISTRAÇÃO
-// ==========================================
-
-// ==========================================================
-// FUNÇÃO DO PAINEL DE ADMINISTRAÇÃO (ESCOPO GLOBAL DO MODULE)
-// ==========================================================
-export async function carregarDashboardPedidosAdmin() {
-    const containerPedidos = document.getElementById('container-pedidos-admin');
-    const countPendentesEl = document.getElementById('admin-count-pendentes');
-    const countEntreguesEl = document.getElementById('admin-count-entregues');
-
-    // Se não estivermos na página certa, interrompe para não dar erro
-    if (!containerPedidos) return;
-
-    try {
-        // Busca os dados na coleção "pedidos" do Firestore
-        // ATENÇÃO: Se no topo do seu script sua variável for "firestore" em vez de "db", mude aqui!
-        const querySnapshot = await getDocs(collection(db, "pedidos"));
-
-        let htmlPedidos = '';
-        let countPendentes = 0;
-        let countEntregues = 0;
-
-        querySnapshot.forEach((docSnap) => {
-            const pedido = docSnap.data();
-            const pedidoId = docSnap.id;
-
-            // Verifica o status (adapte se no seu banco usar outro nome de campo)
-            const status = pedido.status || 'pendente';
-
-            if (status === 'pendente' || status === 'processando' || status === 'Em preparação') {
-                countPendentes++;
-
-                const nomeCliente = pedido.clienteNome || pedido.nome || 'Cliente';
-                const valorTotal = pedido.total ? parseFloat(pedido.total).toFixed(2).replace('.', ',') : '0,00';
-
-                htmlPedidos += `
-                    <div style="border: 1px solid #e0d6d6; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px;">
-                        <div>
-                            <strong style="color: #4a5d23; font-size: 16px;">Pedido #${pedidoId.substring(0,8).toUpperCase()}</strong>
-                            <div style="color: #6b6b6b; font-size: 13px; margin-top: 5px;">
-                                👤 ${nomeCliente} <br>
-                                💰 Valor: R$ ${valorTotal}
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
-                            <span style="background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Aguardando Envio</span>
-                            <button onclick="atualizarStatusPedido('${pedidoId}', 'entregue')" style="padding: 6px 12px; background: #5f7a3f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                                Marcar como Entregue
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else if (status === 'entregue') {
-                countEntregues++;
-            }
-        });
-
-        // Atualiza as contagens nos cards superiores
-        if (countPendentesEl) countPendentesEl.textContent = countPendentes;
-        if (countEntreguesEl) countEntreguesEl.textContent = countEntregues;
-
-        // Injeta a lista gerada ou a mensagem de vazio
-        if (countPendentes === 0) {
-            containerPedidos.innerHTML = `
-                <div style="text-align: center; color: var(--admin-text-muted); padding: 40px;">
-                    <span style="font-size: 24px; display: block; margin-bottom: 10px;">🎉</span> Nenhum pedido pendente no momento!
-                </div>`;
-        } else {
-            containerPedidos.innerHTML = htmlPedidos;
-        }
-
-    } catch (error) {
-        console.error("Erro ao buscar dados no Firebase:", error);
-        containerPedidos.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Erro ao carregar os pedidos do banco de dados.</p>';
-    }
-}
-
-// Garante que a função de atualizar status fique disponível para o clique do botão
-window.atualizarStatusPedido = async function(pedidoId, novoStatus) {
-    try {
-        if (!confirm("Deseja alterar o status do pedido para entregue?")) return;
-        const pedidoRef = doc(db, "pedidos", pedidoId);
-        await setDoc(pedidoRef, { status: novoStatus }, { merge: true });
-        alert("Pedido atualizado!");
-        carregarDashboardPedidosAdmin(); // Recarrega a lista
-    } catch (e) {
-        console.error(e);
-    }
-};
-
-async function carregarQuadroDeFuncionarios() {
-    const c = document.getElementById("container-quadro-funcionarios");
-    if (!c) return;
-    const snap = await getDocs(collection(db, "funcionarios"));
-    if (snap.empty) { c.innerHTML = "<p style='text-align:center;'>Nenhum funcionário ativo listado.</p>"; return; }
-    c.innerHTML = "";
-    snap.forEach(d => {
-        const f = d.data();
-        c.innerHTML += `
-            <div class="order-item-card" style="padding:15px; border-bottom:1px solid #ccc; margin-bottom:10px;">
-                <strong>${(f.nome || 'Nome não preenchido').toUpperCase()}</strong> - ${f.cargo || 'Operacional'} <br>
-                <small>Matrícula: ${f.matricula || 'N/I'} | Contato: ${f.telefone || '-'}</small>
-            </div>`;
-    });
-}
-
-async function carregarFiltroPedidosAdmin(statusFiltro, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const usuarios = await getDocs(collection(db, "usuarios"));
-    container.innerHTML = "";
-    let totalExibido = 0;
-
-    for (const uDoc of usuarios.docs) {
-        const pSnap = await getDocs(collection(db, "usuarios", uDoc.id, "pedidos"));
-        pSnap.forEach(pDoc => {
-            const p = pDoc.data();
-            if (p.status === statusFiltro) {
-                totalExibido++;
-                container.innerHTML += `
-                    <div class="order-item-card" style="padding:15px; border-bottom:1px solid #ccc; margin-bottom:10px;">
-                        <div class="order-info-main">
-                            <strong>Pedido #${pDoc.id.substring(0,6).toUpperCase()}</strong>
-                            <span>Faturamento: R$ ${p.total.toFixed(2)}</span>
-                        </div>
-                        <div style="text-align:right; margin-top:10px;">
-                            <button onclick="alert('Status operacional do pedido modificado!')" style="background:#727e5f; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Avançar Etapa</button>
-                        </div>
-                    </div>`;
-            }
-        });
-    }
-    if (totalExibido === 0) container.innerHTML = `<p style="text-align:center;">Nenhum pedido encontrado sob o status ${statusFiltro}.</p>`;
-}
-
-async function executarProcessoCancellation() {
-    const id = document.getElementById("cancel-pedido-id") ? document.getElementById("cancel-pedido-id").value.trim() : "";
-    const motivo = document.getElementById("cancel-pedido-motivo") ? document.getElementById("cancel-pedido-motivo").value.trim() : "";
-    if (!id || !motivo) return alert("Forneça o ID do documento e a justificativa comercial.");
-
-    const usr = await getDocs(collection(db, "usuarios"));
-    for (const u of usr.docs) {
-        const ref = doc(db, "usuarios", u.id, "pedidos", id);
-        const check = await getDoc(ref);
-        if (check.exists()) {
-            await setDoc(ref, { status: "Cancelado", justificativa: motivo }, { merge: true });
-            alert("O pedido em questão foi abortado e marcado como Cancelado.");
-            carregarPagina('pedidos-admin');
-            return;
-        }
-    }
-    alert("Código identificador do pedido inválido ou inexistente.");
-}
-
-async function calcularEExibirFaturamentoDoDia() {
-    const lista = document.getElementById("lista-transacoes-hoje");
-    if (!lista) return;
-    const usr = await getDocs(collection(db, "usuarios"));
-    let soma = 0,
-        qtd = 0;
-    lista.innerHTML = "";
-
-    const hojeStr = new Date().toLocaleDateString('pt-BR');
-
-    for (const u of usr.docs) {
-        const pSnap = await getDocs(collection(db, "usuarios", u.id, "pedidos"));
-        pSnap.forEach(pDoc => {
-            const p = pDoc.data();
-            let pDataStr = hojeStr;
-            if (p.dataPedido && p.dataPedido.toDate) pDataStr = p.dataPedido.toDate().toLocaleDateString('pt-BR');
-
-            if (pDataStr === hojeStr && p.status !== "Cancelado") {
-                soma += p.total;
-                qtd++;
-                lista.innerHTML += `
-                    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
-                        <span>Protocolo #${pDoc.id.substring(0,6).toUpperCase()}</span>
-                        <strong>R$ ${p.total.toFixed(2)}</strong>
-                    </div>`;
-            }
-        });
-    }
-    const caixaValor = document.getElementById("caixa-valor-hoje");
-    if (caixaValor) caixaValor.innerText = "R$ " + soma.toFixed(2);
-    const caixaVendas = document.getElementById("caixa-vendas-hoje");
-    if (caixaVendas) caixaVendas.innerText = qtd;
-    if (qtd === 0) lista.innerHTML = "<p style='text-align:center;'>Nenhum fluxo comercial registrado na data de hoje.</p>";
-}
-
-// ==========================================
-// INICIALIZAÇÃO GERAL DA PÁGINA FIXA E CARRINHO (DOM)
+// 8. INICIALIZAÇÃO GERAL E ESCUTAS DOM
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     carregarPagina('home');
 
-    // BOTÕES DE ABRIR E FECHAR CARRINHO
     const btnCart = document.getElementById("btn-cart");
     if (btnCart) btnCart.addEventListener("click", abrirCarrinho);
 
@@ -1011,7 +834,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartOverlay = document.getElementById("cart-overlay");
     if (cartOverlay) cartOverlay.addEventListener("click", fecharCarrinho);
 
-    // BOTÃO DE FINALIZAR COMPRA DENTRO DO CARRINHO
     const btnCheckout = document.querySelector(".btn-checkout");
     if (btnCheckout) {
         btnCheckout.addEventListener("click", () => {
@@ -1050,7 +872,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnAccount.addEventListener("click", () => {
             if (usuarioEstaLogado) {
                 if (usuarioEFuncionario) {
-                    carregarPagina('home-admin'); // <--- ALTERADO AQUI
+                    carregarPagina('home-admin');
                 } else {
                     carregarPagina('minha-conta', 'subview-perfil');
                 }
@@ -1059,26 +881,19 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-    // === SISTEMA DE LOGOUT DO ADMIN ===
+
+    // Sistema de Logout Admin adaptado
     document.addEventListener("click", (e) => {
-        // Verifica se o elemento clicado foi o botão de sair do admin
         if (e.target && e.target.id === "btn-sair-admin") {
             e.preventDefault();
 
-            // 1. Chama o Firebase para deslogar a sessão no servidor
-            const auth = getAuth(); // Puxa a autenticação do Firebase
-            signOut(auth).then(() => {
-
-                // 2. Limpa o navegador
+            const firebaseAuth = getAuth();
+            signOut(firebaseAuth).then(() => {
                 localStorage.removeItem("usuarioLogado");
                 localStorage.removeItem("isFunc");
-
-                // 3. Recarrega a página (agora sim, 100% deslogado)
                 window.location.reload();
-
             }).catch((error) => {
                 console.error("Erro ao fazer logout no Firebase:", error);
-                // Por segurança, se der erro, força a limpeza local
                 localStorage.removeItem("usuarioLogado");
                 localStorage.removeItem("isFunc");
                 window.location.reload();

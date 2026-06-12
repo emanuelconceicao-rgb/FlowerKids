@@ -1,0 +1,71 @@
+<style>
+    .form-cadastro-container {
+        max-width: 500px;
+        margin: 20px auto;
+        background: white;
+        padding: 30px;
+        border: 1px solid #e0d6d6;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #4a5d23;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    
+    .btn-salvar {
+        background-color: #5f7a3f;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+    }
+    
+    .btn-salvar:hover {
+        background-color: #728c52;
+    }
+</style>
+
+<div style="margin-bottom: 20px;">
+    <button onclick="window.carregarPagina('quadro-funcionario')" style="background: none; border: none; color: #4a5d23; cursor: pointer; font-weight: bold;">⬅ Voltar para o Quadro</button>
+</div>
+
+<div class="form-cadastro-container">
+    <h2 style="color: #4a5d23; margin-top: 0; text-align: center;">Cadastrar Novo Funcionário</h2>
+
+    <div class="form-group">
+        <label>Nome Completo</label>
+        <input type="text" id="func-nome" placeholder="Ex: João Silva">
+    </div>
+
+    <div class="form-group">
+        <label>Cargo</label>
+        <input type="text" id="func-cargo" placeholder="Ex: Operacional">
+    </div>
+
+    <div class="form-group">
+        <label>Matrícula</label>
+        <input type="text" id="func-matricula" placeholder="Ex: FK-2026">
+    </div>
+
+    <button class="btn-salvar" id="btn-salvar-funcionario">Salvar no Banco</button>
+</div>
