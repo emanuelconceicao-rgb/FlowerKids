@@ -398,28 +398,28 @@ function renderGrid(containerId, productList) {
     productList.forEach(prod => {
         const card = document.createElement("div");
         card.className = "product-card";
+        // AJUSTADO: Agora usa uma tag img com o caminho da imagem real
         card.innerHTML = `
-            <div class="product-img-placeholder">${prod.icone}</div>
+            <div class="product-img-placeholder" style="padding: 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <img src="${prod.imagem}" alt="${prod.nome}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
             <h4 class="product-title">${prod.nome}</h4>
             <p class="product-price">${prod.preco}</p>
             <button class="btn-buy">Comprar</button>
         `;
 
         card.querySelector(".btn-buy").addEventListener("click", () => {
-            // REMOVIDO: O alert antigo para a experiência ficar mais limpa
             const precoFormatado = parseFloat(prod.preco.replace("R$", "").replace(".", "").replace(",", "."));
 
             const itemExistente = carrinho.find(item => item.nome === prod.nome);
             if (itemExistente) {
                 itemExistente.quantidade++;
             } else {
-                carrinho.push({ nome: prod.nome, preco: precoFormatado, icone: prod.icone, quantidade: 1 });
+                // SALVA A IMAGEM TAMBÉM: Passa a imagem real para dentro da estrutura do carrinho
+                carrinho.push({ nome: prod.nome, preco: precoFormatado, imagem: prod.imagem, quantidade: 1 });
             }
 
-            // 1. Atualiza os itens e o número vermelho na barra superior
             atualizarInterfaceCarrinho();
-
-            // 2. ABRE O CARRINHO AO LADO AUTOMATICAMENTE
             abrirCarrinho();
         });
         container.appendChild(card);
@@ -429,25 +429,28 @@ function renderGrid(containerId, productList) {
 function atualizarInterfaceCarrinho() {
     const containerItens = document.getElementById("cart-items");
     const labelTotal = document.getElementById("cart-total-price");
-    const cartCountBadge = document.getElementById("cart-count"); // Puxa a badge do index.html
+    const cartCountBadge = document.getElementById("cart-count");
 
     if (!containerItens) return;
     containerItens.innerHTML = "";
 
     let totalPreco = 0;
-    let totalItens = 0; // Nova variável para contar as quantidades totais
+    let totalItens = 0;
 
     if (carrinho.length === 0) {
         containerItens.innerHTML = '<p class="cart-empty">Seu carrinho está vazio 🥀</p>';
     } else {
         carrinho.forEach((item, index) => {
             totalPreco += (item.preco * item.quantidade);
-            totalItens += item.quantidade; // Soma as unidades deste item ao total
+            totalItens += item.quantidade;
 
             const div = document.createElement("div");
             div.className = "cart-item";
+            // AJUSTADO: Adicionada tag img para renderizar a miniatura da flor no menu do carrinho lateral
             div.innerHTML = `
-                <div class="cart-item-icon">${item.icone}</div>
+                <div class="cart-item-icon" style="overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <img src="${item.imagem}" alt="${item.nome}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                </div>
                 <div class="cart-item-info">
                     <div class="cart-item-title">${item.nome}</div>
                     <div class="cart-item-price">R$ ${item.preco.toFixed(2)} (x${item.quantidade})</div>
@@ -469,13 +472,12 @@ function atualizarInterfaceCarrinho() {
 
     if (labelTotal) labelTotal.innerText = "R$ " + totalPreco.toFixed(2);
 
-    // GERENCIA O CONTADOR VERMELHO (BADGE) NA BARRA SUPERIOR
     if (cartCountBadge) {
         if (totalItens > 0) {
             cartCountBadge.innerText = totalItens;
-            cartCountBadge.style.display = "block"; // Mostra o círculo vermelho
+            cartCountBadge.style.display = "block";
         } else {
-            cartCountBadge.style.display = "none"; // Esconde se o carrinho for zerado
+            cartCountBadge.style.display = "none";
         }
     }
 }
